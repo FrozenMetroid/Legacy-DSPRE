@@ -4369,8 +4369,8 @@ namespace DSPRE {
                     textFont = new Font("Arial", 9.0f);
                     break;
                 case 0x7:
-                    paintPen = new Pen(Color.FromArgb(128, Color.ForestGreen));
-                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.ForestGreen));
+                    paintPen = new Pen(Color.FromArgb(128, Color.DarkGreen));
+                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.DarkGreen));
                     textBrush = new SolidBrush(Color.White);
                     textFont = new Font("Arial", 9.0f);
                     break;
