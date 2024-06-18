@@ -4362,7 +4362,36 @@ namespace DSPRE {
                     textBrush = new SolidBrush(Color.White);
                     textFont = new Font("Arial", 9.0f);
                     break;
+                case 0x6:
+                    paintPen = new Pen(Color.FromArgb(128, Color.YellowGreen));
+                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.YellowGreen));
+                    textBrush = new SolidBrush(Color.White);
+                    textFont = new Font("Arial", 9.0f);
+                    break;
+                case 0x7:
+                    paintPen = new Pen(Color.FromArgb(128, Color.ForestGreen));
+                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.ForestGreen));
+                    textBrush = new SolidBrush(Color.White);
+                    textFont = new Font("Arial", 9.0f);
+                    break;
                 case 0x8:
+                    paintPen = new Pen(Color.FromArgb(128, Color.BurlyWood));
+                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.BurlyWood));
+                    textBrush = new SolidBrush(Color.White);
+                    textFont = new Font("Arial", 8.65f);
+                    break;
+                case 0x9:
+                    paintPen = new Pen(Color.FromArgb(128, Color.SlateBlue));
+                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.SlateBlue));
+                    textBrush = new SolidBrush(Color.White);
+                    textFont = new Font("Arial", 9.0f);
+                    break;
+                case 0xA:
+                    paintPen = new Pen(Color.FromArgb(128, Color.Tomato));
+                    paintBrush = new SolidBrush(Color.FromArgb(128, Color.Tomato));
+                    textBrush = new SolidBrush(Color.White);
+                    textFont = new Font("Arial", 9.0f);
+                    break;
                 case 0xC:
                     paintPen = new Pen(Color.FromArgb(128, Color.BurlyWood));
                     paintBrush = new SolidBrush(Color.FromArgb(128, Color.BurlyWood));
