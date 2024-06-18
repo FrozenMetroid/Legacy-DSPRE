@@ -38,7 +38,7 @@ namespace DSPRE {
             EditorPanels.Initialize(this);
             Helpers.Initialize(this);
             SetMenuLayout(Properties.Settings.Default.menuLayout); //Read user settings for menu layout
-            Text = "DS Pokémon Rom Editor Reloaded " + GetDSPREVersion() + " (Nømura, AdAstra/LD3005, Mixone)";
+            Text = "Legacy DSPRE " + GetDSPREVersion() + " (Nømura, AdAstra/LD3005, Mixone, Senate)";
         }
 
         #region Program Window
