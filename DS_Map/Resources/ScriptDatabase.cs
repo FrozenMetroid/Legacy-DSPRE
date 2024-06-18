@@ -1791,7 +1791,10 @@ namespace DSPRE.Resources {
             [0x0082] = "GetItemPocket",
             [0x0083] = "SetStarter",
             [0x0084] = "GenderMessage",
-
+            [0x0085] = "CheckSeals",
+            [0x0086] = "GiveSeals",
+            [0x0087] = "GiveRandomSeals",
+            [0x0088] = "CheckPokemonForm",
             [0x0089] = "GivePokemon",
             [0x008A] = "GivePokemonEgg",
             [0x008B] = "ReplaceMove",
@@ -1913,7 +1916,7 @@ namespace DSPRE.Resources {
             [0x0137] = "CloseDoor",
             [0x0138] = "GetDaycareNames",
             [0x0139] = "GetDaycareStatus",
-
+            [0x013A] = "InitEcruteakGym",
             [0x0141] = "VermillionGymAnimation",
             [0x0142] = "VermillionGymBin",
 
@@ -1924,6 +1927,7 @@ namespace DSPRE.Resources {
             [0x0148] = "AzaleaGym2",
 
             [0x014C] = "GetPartyCount",
+            [0x014D] = "BagScreen",
 
             [0x0152] = "SetOWDefaultPosition",
             [0x0153] = "SetOWPosition",
@@ -2024,6 +2028,7 @@ namespace DSPRE.Resources {
 
             [0x01EF] = "CheckVersion",
             [0x01F0] = "FirstPokemonInParty",
+            [0x01F1] = "CheckPokemonTypes",
 
             [0x01F7] = "GetLottoNumber",
             [0x01F8] = "CheckWinLotto",
@@ -2116,6 +2121,7 @@ namespace DSPRE.Resources {
             [0x031B] = "ShowMomMoney",
             [0x031C] = "HideMomMoney",
 
+
             [0x0344] = "CheckJadeOrbRequirements",
 
             [0x0346] = "CheckMoneyFull",
@@ -2128,6 +2134,7 @@ namespace DSPRE.Resources {
             [0x0352] = "TextSealPlural",
             [0x0353] = "TextCapitalize",
             [0x0354] = "TextFloor"
+
         };
         public static Dictionary<ushort, byte[]> HGSSScrCmdParameters = new Dictionary<ushort, byte[]>() {
             [0x0000] = new byte[1] { 0 },
