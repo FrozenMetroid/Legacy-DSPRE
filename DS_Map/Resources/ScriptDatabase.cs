@@ -2064,6 +2064,9 @@ namespace DSPRE.Resources {
             [0x0220] = "MusicVolumeSet",
             [0x0221] = "CountSeenUnown",
 
+            [0x022C] = "TakeBP",
+            [0x022D] = "CheckBP",
+
             [0x0231] = "ShakeCamera",
             [0x0232] = "Battle2vs2",
 
@@ -2129,6 +2132,12 @@ namespace DSPRE.Resources {
             [0x02EE] = "MultiTouchLocalText",
             [0x02EF] = "CreateMultiTouchBox",
             [0x02F0] = "CloseMultiTouch",
+
+            [0x0289] = "ScratchOffCard",
+            [0x028A] = "EndScratchOffCard",
+            [0x028B] = "GetScratchOffPrize",
+
+            [0x0310] = "ScriptOverlayCmd",
 
             [0x031B] = "ShowMomMoney",
             [0x031C] = "HideMomMoney",
@@ -2834,7 +2843,7 @@ namespace DSPRE.Resources {
             [0x0287] = new byte[] { 2, 2 }, //To be checked!
             [0x0288] = new byte[] { 2 },
             [0x0289] = new byte[1] { 0 },
-            [0x028A] = new byte[] { 2 },
+            [0x028A] = new byte[1] { 0 },
             [0x028B] = new byte[] { 2, 2, 2 },
             [0x028C] = new byte[] { 2, 2, 2 },
             [0x028D] = new byte[] { 2, 2, 2, 2 },
@@ -2968,7 +2977,7 @@ namespace DSPRE.Resources {
             [0x030D] = new byte[] { 2 },
             [0x030E] = new byte[1] { 0 },
             [0x030F] = new byte[] { 1 },
-            [0x0310] = new byte[] { 2 },
+            [0x0310] = new byte[] { 1, 1 },
             [0x0311] = new byte[] { 2, 1 },
             [0x0312] = new byte[] { 1 },
             [0x0313] = new byte[] { 2, 2, 2 },
