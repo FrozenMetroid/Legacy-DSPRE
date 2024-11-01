@@ -310,8 +310,7 @@ namespace DSPRE {
         #endregion
 
         public string GetDSPREVersion() {
-            return "" + Assembly.GetExecutingAssembly().GetName().Version.Major + "." + Assembly.GetExecutingAssembly().GetName().Version.Minor +
-                "." + Assembly.GetExecutingAssembly().GetName().Version.Build;
+            return "- Legacy Edition Version -";
         }
 
         private void romToolBoxToolStripMenuItem_Click(object sender, EventArgs e) {

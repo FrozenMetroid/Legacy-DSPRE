@@ -1143,7 +1143,7 @@ namespace DSPRE
                     break;
 
                 default: // HGSS
-                    trainerFunnyScriptNumber = 740;
+                    trainerFunnyScriptNumber = 1500;
                     break;
             }
         }        
