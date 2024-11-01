@@ -4,11 +4,19 @@ using System.Runtime.InteropServices;
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
 // set di attributi. Modificare i valori di questi attributi per modificare le informazioni
 // associate a un assembly.
+<<<<<<< HEAD
 [assembly: AssemblyTitle("Legacy DSPRE 1.12.4")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Legacy DSPRE 1.12.4")]
+=======
+[assembly: AssemblyTitle("DSPRE Reloaded 1.13")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("DSPRE Reloaded 1.13")]
+>>>>>>> 1cf7407516895bb09c8baa8efad5d40a959a4e6b
 [assembly: AssemblyCopyright("Copyright © 2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -31,5 +39,5 @@ using System.Runtime.InteropServices;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build
 // usando l'asterisco '*' come illustrato di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.12.4")]
-[assembly: AssemblyFileVersion("1.12.4")]
+[assembly: AssemblyVersion("1.13")]
+[assembly: AssemblyFileVersion("1.13")]
