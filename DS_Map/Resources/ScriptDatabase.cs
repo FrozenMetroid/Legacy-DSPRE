@@ -2136,6 +2136,7 @@ namespace DSPRE.Resources {
 
             [0x026A] = "CheckAlbumPhoto",
 
+            [0x026D] = "UpdateStarterSelectionMachine",
             [0x026E] = "GetOWDirection",
 
             [0x0289] = "ScratchOffScreen",
@@ -2856,7 +2857,7 @@ namespace DSPRE.Resources {
             [0x026A] = new byte[] { 2 },
             [0x026B] = new byte[] { 2 },
             [0x026C] = new byte[] { 1 },
-            [0x026D] = new byte[] { 2 },
+            [0x026D] = new byte[1] { 0 },
             [0x026E] = new byte[] { 2, 2 },
             [0x026F] = new byte[] { 2 },
             [0x0270] = new byte[] { 2 },
