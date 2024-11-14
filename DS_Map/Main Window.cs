@@ -8782,6 +8782,10 @@ namespace DSPRE {
                     pokemonFormNames.Add("Land Form");
                     pokemonFormNames.Add("Sky Form");
                     break;
+                case GIRATINA_ID_NUM:
+                    pokemonFormNames.Add("Altered Form");
+                    pokemonFormNames.Add("Origin Form");
+                    break;
                 default:
                     pokemonFormNames.Add("No Alt Form");
                     break;
