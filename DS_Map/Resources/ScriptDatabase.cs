@@ -1883,7 +1883,7 @@ namespace DSPRE.Resources {
             [0x00C5] = "TextMove",
             [0x00C6] = "TextNumber",
             [0x00C7] = "TextPokeNickname",
-            
+
             [0x00C9] = "TextPlayerTrainerType",
             [0x00CA] = "TextPokemon",
             [0x00CB] = "TextStarterPokemon",
@@ -2026,7 +2026,7 @@ namespace DSPRE.Resources {
             [0x01A8] = "CheckCompleteNationalDex",
 
             [0x01AD] = "GetFossilCount",
-            
+
             [0x01AE] = "PreparePokeGearCall",
             [0x01AF] = "StartPokeGearCall",
 
@@ -2175,6 +2175,10 @@ namespace DSPRE.Resources {
             [0x02EE] = "MultiTouchLocalText",
             [0x02EF] = "CreateMultiTouchBox",
             [0x02F0] = "CloseMultiTouch",
+
+            [0x02F3] = "LegendaryBellAnimationBegin",
+            [0x02F4] = "LegendaryBellAnimationEnd",
+            [0x02F5] = "LegendaryBellRiseFromBag",
 
             [0x0289] = "ScratchOffCard",
             [0x028A] = "EndScratchOffCard",
@@ -2993,7 +2997,7 @@ namespace DSPRE.Resources {
             [0x02F2] = new byte[] { 2 },
             [0x02F3] = new byte[1] { 0 },
             [0x02F4] = new byte[1] { 0 },
-            [0x02F5] = new byte[] { 2, 2 },
+            [0x02F5] = new byte[1] { 0 },
             [0x02F6] = new byte[] { 2, 2, 2 },
             [0x02F7] = new byte[1] { 0 },
             [0x02F8] = new byte[1] { 0 },
