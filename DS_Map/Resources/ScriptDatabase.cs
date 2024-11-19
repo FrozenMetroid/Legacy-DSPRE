@@ -2184,6 +2184,8 @@ namespace DSPRE.Resources {
             [0x028A] = "EndScratchOffCard",
             [0x028B] = "GetScratchOffPrize",
 
+            [0x0306] = "ShowLegendaryWing",
+
             [0x0310] = "OverlayManager",
 
             [0x031B] = "ShowMomMoney",
@@ -3014,7 +3016,7 @@ namespace DSPRE.Resources {
             [0x0303] = new byte[1] { 0 },
             [0x0304] = new byte[1] { 0 },
             [0x0305] = new byte[] { 2 },
-            [0x0306] = new byte[] { 2, 2 },
+            [0x0306] = new byte[] { 2 },
             [0x0307] = new byte[] { 2, 2 },
             [0x0308] = new byte[1] { 0 },
             [0x0309] = new byte[] { 2, 2 },
