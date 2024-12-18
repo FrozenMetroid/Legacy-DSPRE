@@ -1991,6 +1991,8 @@ namespace DSPRE.Resources {
             [0x0167] = "CountPartyEggs",
             [0x0168] = "TakeMoneyFlex",
 
+            [0x016A] = "GiveLoanPokemon",
+            [0x016B] = "CheckReturnLoanPokemon",
             [0x016C] = "DeletePartyPokemon",
 
             [0x0170] = "CompareMoneyFlex",
@@ -2569,7 +2571,7 @@ namespace DSPRE.Resources {
             [0x0167] = new byte[] { 2 },
             [0x0168] = new byte[] { 2 },
             [0x0169] = new byte[] { 2, 2 },
-            [0x016A] = new byte[] { 2, 2 },
+            [0x016A] = new byte[] { 1, 1, 2 },
             [0x016B] = new byte[] { 1, 2, 2 },
             [0x016C] = new byte[] { 2 },
             [0x016D] = new byte[1] { 0 },
