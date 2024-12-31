@@ -2159,7 +2159,7 @@ namespace DSPRE.Resources {
 
             [0x02C7] = "TalkFollowingPoke",
 
-            [0x02C9] = "OpenAlphaPuzzle",
+            [0x02C9] = "OpenAlphPuzzle",
             [0x02CA] = "OpenRuinsofAlphHiddenRoom",
 
             [0x02D3] = "BoatAnimation",

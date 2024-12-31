@@ -4358,6 +4358,10 @@ namespace DSPRE {
                     paintPen = new Pen(Color.FromArgb(Transparency, Color.LimeGreen));
                     paintBrush = new SolidBrush(Color.FromArgb(Transparency, Color.LimeGreen));
                     break;
+                case 0x05: // Sand
+                    paintPen = new Pen(Color.FromArgb(Transparency, Color.Moccasin));
+                    paintBrush = new SolidBrush(Color.FromArgb(Transparency, Color.Moccasin));
+                    break;
                 case 0x06: // Stairs and ice
                     paintPen = new Pen(Color.FromArgb(Transparency, Color.PowderBlue));
                     paintBrush = new SolidBrush(Color.FromArgb(Transparency, Color.PowderBlue));
