@@ -1521,6 +1521,8 @@ namespace DSPRE.Resources {
                     [new List<uint> { 831 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { 832 }] = (Color.SteelBlue, Color.White),
                     [new List<uint> { 842 }] = (Color.Magenta, Color.White),
+                    [new List<uint> { 845 }] = (Color.ForestGreen, Color.White),
+                    [new List<uint> { 846 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { GameMatrix.EMPTY }] = (Color.Black, Color.White)
                 };
                 public static Dictionary<List<uint>, (Color back, Color fore)> GenericMatrixColorsDict = new Dictionary<List<uint>, (Color back, Color fore)> {
