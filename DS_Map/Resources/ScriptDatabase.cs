@@ -1841,12 +1841,12 @@ namespace DSPRE.Resources {
             [0x008B] = "ReplaceMove",
             [0x008C] = "CheckPokemonHasMove",
             [0x008D] = "CheckMoveInParty",
-
+            [0x008E] = "CheckPokegearRematch",
             [0x008F] = "ChooseRivalName",
             [0x0090] = "GetCounterpartSprite",
             [0x0091] = "UpgradePokegear",
             [0x0092] = "RecordPokegearNumber", //to be confirmed
-
+            [0x0093] = "CheckPokegearNumberRegistered",
             [0x0096] = "ReturnScreen",
 
             [0x009D] = "WorldMapScreen",
@@ -1959,8 +1959,10 @@ namespace DSPRE.Resources {
             [0x0138] = "GetDaycareNames",
             [0x0139] = "GetDaycareStatus",
             [0x013A] = "InitEcruteakGym",
-            [0x0141] = "VermillionGymAnimation",
-            [0x0142] = "VermillionGymBin",
+
+            [0x0140] = "VermilionGymInit",
+            [0x0141] = "VermilionGymAnimation",
+            [0x0142] = "VermilionGymBin",
 
             [0x0144] = "InitVioletGym",
             [0x0145] = "VioletGymElevator",
@@ -2029,8 +2031,8 @@ namespace DSPRE.Resources {
 
             [0x01AD] = "GetFossilCount",
 
-            [0x01AE] = "PreparePokeGearCall",
-            [0x01AF] = "StartPokeGearCall",
+            [0x01AE] = "PreparePokegearCall",
+            [0x01AF] = "StartPokegearCall",
 
             [0x01B0] = "GetPokeNameFromFossil",
             [0x01B1] = "CheckFossil",
@@ -2529,7 +2531,7 @@ namespace DSPRE.Resources {
             [0x013D] = new byte[] { 1 },
             [0x013E] = new byte[1] { 0 },
             [0x013F] = new byte[] { 2 },
-            [0x0140] = new byte[] { 2 },
+            [0x0140] = new byte[1] { 0 },
             [0x0141] = new byte[] { 2 },
             [0x0142] = new byte[] { 1, 2 },
             [0x0143] = new byte[] { 2, 2 },
