@@ -2084,6 +2084,7 @@ namespace DSPRE.Resources {
 
             [0x01FB] = "CountPCFreeSpace",
 
+            [0x0203] = "AddTrainerScore",
             [0x0204] = "TextAccessory",
             [0x0205] = "CheckPokemonInParty",
             [0x0206] = "SetDeoxysForm",
@@ -2142,6 +2143,10 @@ namespace DSPRE.Resources {
 
             [0x026D] = "UpdateStarterSelectionMachine",
             [0x026E] = "GetOWDirection",
+            [0x026F] = "ApricornTreeAnimation",
+            [0x0270] = "CheckApricornType",
+            [0x0271] = "GiveApricorn",
+            [0x0272] = "TextApricorn",
 
             [0x0289] = "ScratchOffScreen",
             [0x028A] = "ReleaseScriptApp",
