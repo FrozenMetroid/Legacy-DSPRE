@@ -1107,9 +1107,9 @@ namespace DSPRE {
                     flag6CheckBox.Visible = true;
                     flag5CheckBox.Visible = true;
                     flag4CheckBox.Visible = true;
-                    flag6CheckBox.Text = "Flag ?";
-                    flag5CheckBox.Text = "Flag ?";
-                    flag4CheckBox.Text = "Flag ?";
+                    flag6CheckBox.Text = "Radio";
+                    flag5CheckBox.Text = "R. Calls";
+                    flag4CheckBox.Text = "M. Calls";
 
                     worldmapCoordsGroupBox.Enabled = true;
                     break;
