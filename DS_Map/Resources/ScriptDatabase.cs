@@ -2153,6 +2153,8 @@ namespace DSPRE.Resources {
 
             [0x0290] = "CheckHeadbuttCompatibility",
 
+            [0x029D] = "GetItemQuantity",
+
             [0x02AB] = "GetBattleOutcome",
             [0x02AC] = "GetCurrentWeather",
             [0x02AD] = "GetPlayerPositionFull",
@@ -2200,6 +2202,7 @@ namespace DSPRE.Resources {
             [0x031B] = "ShowMomMoney",
             [0x031C] = "HideMomMoney",
 
+            [0x032D] = "CheckMomGift",
 
             [0x0344] = "CheckJadeOrbRequirements",
 
