@@ -2204,6 +2204,8 @@ namespace DSPRE.Resources {
 
             [0x032D] = "CheckMomGift",
 
+            [0x033C] = "AddContestStat",
+
             [0x0344] = "CheckJadeOrbRequirements",
 
             [0x0346] = "CheckMoneyFull",
@@ -3082,7 +3084,7 @@ namespace DSPRE.Resources {
             [0x0339] = new byte[] { 2, 2 },
             [0x033A] = new byte[] { 2 },
             [0x033B] = new byte[] { 2, 2 },
-            [0x033C] = new byte[] { 2, 2, 1 },
+            [0x033C] = new byte[] { 2, 1, 2 },
             [0x033D] = new byte[] { 2 },
             [0x033E] = new byte[] { 2 },
             [0x033F] = new byte[] { 2 },
