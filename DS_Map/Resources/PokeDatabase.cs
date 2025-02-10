@@ -283,7 +283,7 @@ namespace DSPRE.Resources {
                 [1078] = "Victory Road [Unused 1]",
                 [1080] = "Victory Road [Unused 2]",
                 [1081] = "Pokémon Center (Day)",
-                [1073] = "Stark Mountain (in) [Unused]",
+                // [1073] = "Stark Mountain (in) [Unused]",
                 [1084] = "Hall of Fame [Unused]",
                 [1085] = "Pokémon Center (Day)",
                 [1086] = "Pokémon Center (Night)",
