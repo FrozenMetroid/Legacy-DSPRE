@@ -636,6 +636,7 @@ namespace DSPRE.Resources {
 
             [0x0246] = "CheckVersion",
             [0x0247] = "FirstPokemonInParty",
+            [0x0248] = "GetPartyPokemonTypes",
 
             [0x024E] = "GetLottoNumber",
             [0x024F] = "CheckWinLotto",
