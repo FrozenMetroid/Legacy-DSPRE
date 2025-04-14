@@ -1971,6 +1971,8 @@ namespace DSPRE.Resources {
             [0x0147] = "AzaleaGym",
             [0x0148] = "AzaleaGym2",
 
+            [0x014A] = "FuchsiaGymInit",
+
             [0x014C] = "GetPartyCount",
             [0x014D] = "BagScreen",
 
