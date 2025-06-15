@@ -102,6 +102,7 @@
     <Compile Include="AddressHelper.Designer.cs">
       <DependentUpon>AddressHelper.cs</DependentUpon>
     </Compile>
+    <Compile Include="DocTool.cs" />
     <Compile Include="DSUtils\ARM9.cs" />
     <Compile Include="DSUtils\DSUtils.cs" />
     <Compile Include="DSUtils\ModelUtils.cs" />
@@ -110,7 +111,9 @@
     <Compile Include="DVCalculator\DVCalc.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DVCalculator\DVCalc.Designer.cs" />
+    <Compile Include="DVCalculator\DVCalc.Designer.cs">
+      <DependentUpon>DVCalc.cs</DependentUpon>
+    </Compile>
     <Compile Include="DVCalculator\DVCalcNatureViewerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,6 +137,12 @@
     </Compile>
     <Compile Include="Editors\HeadbuttEncounterEditorTab.Designer.cs">
       <DependentUpon>HeadbuttEncounterEditorTab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\ItemEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\ItemEditor.Designer.cs">
+      <DependentUpon>ItemEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\LevelScriptEditor.cs">
       <SubType>UserControl</SubType>
@@ -202,6 +211,12 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Filesystem.cs" />
+    <Compile Include="FlyEditor\Data\FlyTableRowDpPlat.cs" />
+    <Compile Include="FlyEditor\Data\FlyTableRowHgss.cs" />
+    <Compile Include="FlyEditor\FlyEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FlyEditor\FlyEditor.Designer.cs" />
     <Compile Include="GameCamera.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="InputComboBox.cs">
@@ -268,10 +283,9 @@
     <Compile Include="ROMFiles\HeadbuttEncounterMap.cs" />
     <Compile Include="ROMFiles\HeadbuttTree.cs" />
     <Compile Include="ROMFiles\HeadbuttTreeGroup.cs" />
+    <Compile Include="ROMFiles\ItemData.cs" />
     <Compile Include="ROMFiles\LearnsetData.cs" />
     <Compile Include="ROMFiles\LevelScriptFile.cs" />
-    <Compile Include="ROMFiles\LevelScriptTrigger.cs" />
-    <Compile Include="ROMFiles\MapScreenLoadTrigger.cs" />
     <Compile Include="ROMFiles\MoveData.cs" />
     <Compile Include="ROMFiles\PokemonPersonalData.cs" />
     <Compile Include="ROMFiles\RomFile.cs" />
@@ -279,15 +293,18 @@
     <Compile Include="ROMFiles\SafariZoneEncounterFile.cs" />
     <Compile Include="ROMFiles\SafariZoneEncounterGroup.cs" />
     <Compile Include="ROMFiles\SafariZoneObjectRequirement.cs" />
-    <Compile Include="ROMFiles\ScriptAction.cs" />
     <Compile Include="ROMFiles\ScriptActionContainer.cs" />
-    <Compile Include="ROMFiles\ScriptCommand.cs" />
     <Compile Include="ROMFiles\ScriptCommandContainer.cs" />
     <Compile Include="ROMFiles\ScriptFile.cs" />
+    <Compile Include="ROMFiles\LevelScriptTrigger.cs" />
+    <Compile Include="ROMFiles\MapScreenLoadTrigger.cs" />
+    <Compile Include="ROMFiles\ScriptAction.cs" />
+    <Compile Include="Script\ScriptCommandPosition.cs" />
+    <Compile Include="Script\ScriptLabeledSection.cs" />
+    <Compile Include="Script\ScriptParameter.cs" />
     <Compile Include="ROMFiles\ScriptReference.cs" />
     <Compile Include="ROMFiles\SpeciesFile.cs" />
     <Compile Include="ROMFiles\TrainerFile.cs" />
-    <Compile Include="ROMFiles\VariableValueTrigger.cs" />
     <Compile Include="PatchToolboxDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -301,6 +318,7 @@
       <DependentUpon>BuildingEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="RomInfo.cs" />
+    <Compile Include="ROMFiles\ScriptCommand.cs" />
     <Compile Include="ScintillaUtils\HotKeyManager.cs" />
     <Compile Include="ScintillaUtils\ScriptTooltip.cs">
       <SubType>Form</SubType>
@@ -309,6 +327,7 @@
       <DependentUpon>ScriptTooltip.cs</DependentUpon>
     </Compile>
     <Compile Include="ScintillaUtils\SearchManager.cs" />
+    <Compile Include="ROMFiles\VariableValueTrigger.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsWindow.cs">
       <SubType>Form</SubType>
@@ -404,7 +423,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\writeText.Designer.cs" />
-    <EmbeddedResource Include="DVCalculator\DVCalc.resx" />
+    <EmbeddedResource Include="DVCalculator\DVCalc.resx">
+      <DependentUpon>DVCalc.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DVCalculator\DVCalcNatureViewerForm.resx" />
     <EmbeddedResource Include="Editors\EncountersEditor.resx">
       <DependentUpon>EncountersEditor.cs</DependentUpon>
@@ -414,6 +435,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\HeadbuttEncounterEditorTab.resx">
       <DependentUpon>HeadbuttEncounterEditorTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\ItemEditor.resx">
+      <DependentUpon>ItemEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\LevelScriptEditor.resx">
       <DependentUpon>LevelScriptEditor.cs</DependentUpon>
@@ -439,6 +463,7 @@
     <EmbeddedResource Include="Editors\EvolutionsEditor.resx">
       <DependentUpon>EvolutionsEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FlyEditor\FlyEditor.resx" />
     <EmbeddedResource Include="HeaderSearch.resx">
       <DependentUpon>HeaderSearch.cs</DependentUpon>
     </EmbeddedResource>

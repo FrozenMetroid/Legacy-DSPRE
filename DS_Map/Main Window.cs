@@ -1,4 +1,14 @@
-﻿using System;
+﻿using DSPRE.Editors;
+using DSPRE.Resources;
+using DSPRE.ROMFiles;
+using Ekona.Images;
+using Images;
+using LibNDSFormats.NSBMD;
+using LibNDSFormats.NSBTX;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using NarcAPI;
+using NSMBe4.NSBMD;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5501,8 +5511,10 @@ namespace DSPRE {
             } else {
                 ScriptFile itemScript = new ScriptFile(RomInfo.itemScriptFileNumber);
                 owItemComboBox.Items.Clear();
-                foreach (ScriptCommandContainer cont in itemScript.allScripts) {
-                    if (cont.commands.Count > 4) {
+                foreach (ScriptCommandContainer cont in itemScript.allScripts)
+                {
+                    if (cont.commands.Count > 4)
+                    {
                         continue;
                     }
                     owItemComboBox.Items.Add(BitConverter.ToUInt16(cont.commands[1].cmdParams[1], 0) + "x " + itemNames[BitConverter.ToUInt16(cont.commands[0].cmdParams[1], 0)]);
@@ -7925,6 +7937,7 @@ namespace DSPRE {
             pokemonSpecies = new SpeciesFile[numPokemonSpecies];
 
             RomInfo.SetMonIconsPalTableAddress();
+            RomInfo.SetAIBackportEnabled();
 
             partyPokemonComboboxList.Clear();
             partyPokemonComboboxList.Add(partyPokemon1ComboBox);
@@ -8041,7 +8054,7 @@ namespace DSPRE {
                 pokemonSpecies[i] = new SpeciesFile(new FileStream(RomInfo.gameDirs[DirNames.personalPokeData].unpackedDir + "\\" + i.ToString("D4"), FileMode.Open));
             }
 
-            if (gameFamily == GameFamilies.HGSS) {
+            if (gameFamily == GameFamilies.HGSS || RomInfo.AIBackportEnabled) {
                 foreach (ComboBox partyGenderComboBox in partyGenderComboBoxList) {
                     partyGenderComboBox.Visible = true;
                     partyGenderComboBox.Items.Add("Default Gender");
@@ -8282,7 +8295,10 @@ namespace DSPRE {
         }
 
         private void DVExplainButton_Click(object sender, EventArgs e) {
-            DVCalc DVcalcForm = new DVCalc(trainerComboBox.SelectedIndex, trainerClassListBox.SelectedIndex);
+            uint trainerIdx = (uint)trainerComboBox.SelectedIndex;
+            uint trainerClassIdx = (uint)trainerClassListBox.SelectedIndex;
+
+            DVCalc DVcalcForm = new DVCalc(trainerIdx, trainerClassIdx);
             DVcalcForm.ShowDialog();
         }
 
@@ -8359,6 +8375,9 @@ namespace DSPRE {
                 currentTrainerFile.party[i].moves = trainerMovesCheckBox.Checked ? new ushort[4] : null;
             }
 
+            // Need to account for the case where ability 2 was set on a previous mon. If so then ability one flag needs to be set on other mons with ability 1
+            bool wasAbility2Set = false;
+
             for (int i = 0; i < partyCountUpDown.Value; i++) {
                 currentTrainerFile.party[i].pokeID = (ushort)partyPokemonComboboxList[i].SelectedIndex;
                 currentTrainerFile.party[i].formID = (ushort)partyFormComboBoxList[i].SelectedIndex;
@@ -8377,7 +8396,7 @@ namespace DSPRE {
 
                 currentTrainerFile.party[i].difficulty = (byte)partyIVUpdownList[i].Value;
 
-                if (hasMoreThanOneGender((int)currentTrainerFile.party[i].pokeID, pokemonSpecies) && gameFamily == GameFamilies.HGSS) {
+                if (hasMoreThanOneGender((int)currentTrainerFile.party[i].pokeID, pokemonSpecies) && (gameFamily == GameFamilies.HGSS || RomInfo.AIBackportEnabled)) {
                     switch (partyGenderComboBoxList[i].SelectedIndex) {
                         case TRAINER_PARTY_POKEMON_GENDER_DEFAULT_INDEX:
                             currentTrainerFile.party[i].genderAndAbilityFlags = PartyPokemon.GenderAndAbilityFlags.NO_FLAGS;
@@ -8396,6 +8415,11 @@ namespace DSPRE {
 
                 if (partyAbilityComboBoxList[i].SelectedIndex == TRAINER_PARTY_POKEMON_ABILITY_SLOT2_INDEX) {
                     currentTrainerFile.party[i].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT2;
+                    wasAbility2Set = true;
+                }
+                // If ability 2 was set previously force ability 1 must be set here other wise the pokemon will have ability 2
+                else if (wasAbility2Set && partyAbilityComboBoxList[i].SelectedIndex == TRAINER_PARTY_POKEMON_ABILITY_SLOT1_INDEX) {
+                    currentTrainerFile.party[i].genderAndAbilityFlags |= PartyPokemon.GenderAndAbilityFlags.ABILITY_SLOT1;
                 }
                 //ability slot 1 flag must be set if the pokemon's gender is forced to male or female, otherwise the pokemon will have ability2 even if the ability2 flag is not set
                 //the ability 1 flag should not be set if neither of the gender flags are set, otherwise this will cause a problem with using alternate forms
@@ -8701,7 +8725,7 @@ namespace DSPRE {
             partyAbilityComboBoxList[partyPokemonPosition].Items.Add(ability1);
             
             //if the name " -" is returned for ability 2 then there is no ability 2
-            if (ability2.Equals(" -") || gameFamily != GameFamilies.HGSS) {
+            if (ability2.Equals(" -") || (gameFamily != GameFamilies.HGSS && !RomInfo.AIBackportEnabled)) {
                 partyAbilityComboBoxList[partyPokemonPosition].Enabled = false;
             } else {
                 string stringAbi2 = ability2;
@@ -8720,7 +8744,7 @@ namespace DSPRE {
             int currentPokemonGenderRatio = pokemonSpecies[partyPokemonComboboxList[partyPokemonPosition].SelectedIndex].GenderRatioMaleToFemale;
             PartyPokemon.GenderAndAbilityFlags currentPokemonGenderAndAbilityFlags = currentTrainerFile.party[partyPokemonPosition].genderAndAbilityFlags;
 
-            if (gameFamily == GameFamilies.HGSS) {
+            if (gameFamily == GameFamilies.HGSS || RomInfo.AIBackportEnabled) {
                 switch (currentPokemonGenderRatio) {
                     case GENDER_RATIO_MALE:
                         partyGenderComboBoxList[partyPokemonPosition].SelectedIndex = TRAINER_PARTY_POKEMON_GENDER_MALE_INDEX;
@@ -9235,7 +9259,7 @@ namespace DSPRE {
 
         private void unpackToFolderToolStripMenuItem_Click(object sender, EventArgs e) {
             OpenFileDialog of = new OpenFileDialog {
-                Filter = "NARC File (*.narc)|*.narc"
+                Filter = "NARC File (*.narc)|*.narc|All files (*.*)|*.*"
             };
             if (of.ShowDialog(this) != DialogResult.OK) {
                 return;
@@ -10050,6 +10074,38 @@ namespace DSPRE {
         private void exportScriptDatabaseJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Not implemented yet");
+        }
+
+        private void generateCSVToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Helpers.statusLabelMessage("Exporting to CSV...");
+            Update();
+            DocTool.ExportAll();
+
+            Helpers.statusLabelMessage();
+            Update();
+        }
+
+        private void flyWarpEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var flyEditor = new FlyEditor(gameFamily, headerListBoxNames);
+            flyEditor.Show();
+        }
+
+        private void itemEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Helpers.statusLabelMessage("Setting up Item Data Editor...");
+            Update();
+
+            DSUtils.TryUnpackNarcs(new List<DirNames> { DirNames.itemData });
+
+            ItemEditor itemEditor = new ItemEditor(
+                RomInfo.GetItemNames()
+            );
+            itemEditor.ShowDialog();
+
+            Helpers.statusLabelMessage();
+            Update();
         }
     }
 }

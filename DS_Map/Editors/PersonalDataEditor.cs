@@ -36,7 +36,7 @@ namespace DSPRE {
             item1InputComboBox.DataSource = new BindingSource(listItemNames, string.Empty);
             item2InputComboBox.DataSource = new BindingSource(listItemNames, string.Empty);
 
-            BindingList<string> listTypeNames = new BindingList<string>(Enum.GetNames(typeof(PokemonType)));
+            BindingList<string> listTypeNames = new BindingList<string>(RomInfo.GetTypeNames());
             type1InputComboBox.DataSource = new BindingSource(listTypeNames, string.Empty);
             type2InputComboBox.DataSource = new BindingSource(listTypeNames, string.Empty);
 
@@ -59,11 +59,15 @@ namespace DSPRE {
             List<string> fileNames = new List<string>(count);
             fileNames.AddRange(pokenames);
 
-            for (int i = 0; i < count - pokenames.Length; i++) {
-                PokeDatabase.PersonalData.PersonalExtraFiles extraEntry = PokeDatabase.PersonalData.personalExtraFiles[i];
-                fileNames.Add(fileNames[extraEntry.monId] + " - " + extraEntry.description);
+            for (int i = 0; i < PokeDatabase.PersonalData.personalExtraFiles.Length; i++) {
+                PokeDatabase.PersonalData.PersonalExtraFiles altFormEntry = PokeDatabase.PersonalData.personalExtraFiles[i];
+                fileNames.Add(fileNames[altFormEntry.monId] + " - " + altFormEntry.description);
             }
 
+            int extraEntries = fileNames.Count;
+            for (int i = 0; i < count - extraEntries; i++) {
+                fileNames.Add($"Extra entry {fileNames.Count}");
+            }
             
             this.fileNames = fileNames.ToArray();
             monNumberNumericUpDown.Maximum = fileNames.Count - 1;
@@ -394,10 +398,10 @@ namespace DSPRE {
         }
         private void saveDataButton_Click(object sender, EventArgs e) {
             currentLoadedFile.SaveToFileDefaultDir(currentLoadedId, true);
-            if (modifiedAbilities) {
-                EditorPanels.MainProgram.RefreshAbilities(currentLoadedId);
-                modifiedAbilities = false;
-            }
+            //if (modifiedAbilities) {
+            //    EditorPanels.MainProgram.RefreshAbilities(currentLoadedId);
+            //    modifiedAbilities = false;
+            //}
             setDirty(false);
         }
         //-------------------------------
@@ -494,11 +498,15 @@ namespace DSPRE {
             RebuildMachinesListBoxes();
 
             int excess = toLoad - pokenames.Length;
-            if (excess >= 0) {
-                toLoad = PokeDatabase.PersonalData.personalExtraFiles[excess].iconId;
+            try {
+                if (excess >= 0) {
+                    toLoad = PokeDatabase.PersonalData.personalExtraFiles[excess].iconId;
+                }
+            } catch (IndexOutOfRangeException) {
+                toLoad = 0;
+            } finally {
+                pokemonPictureBox.Image = DSUtils.GetPokePic(toLoad, pokemonPictureBox.Width, pokemonPictureBox.Height);
             }
-            pokemonPictureBox.Image = DSUtils.GetPokePic(toLoad, pokemonPictureBox.Width, pokemonPictureBox.Height);
-
             setDirty(false);
         }
 

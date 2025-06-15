@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace DSPRE.ROMFiles {
@@ -23,8 +24,11 @@ namespace DSPRE.ROMFiles {
         public List<byte[]> cmdParams;
         public string name;
 
-        public ScriptCommand(ushort id, List<byte[]> parametersList) {
-            if (parametersList is null) {
+        // CHANGE: Update the constructor to use ScriptParameter
+        public ScriptCommand(ushort id, List<byte[]> parametersList)
+        {
+            if (parametersList is null)
+            {
                 this.id = null;
                 return;
             }
@@ -50,6 +54,7 @@ namespace DSPRE.ROMFiles {
                 {
                         string number = FormatNumber(parametersList[1], ParamTypeEnum.FUNCTION_ID);
 
+                        // Access the byte value from the parameter's raw data
                         if (RomInfo.ScriptComparisonOperatorsDict.TryGetValue(parametersList[0][0], out string v)) {
                             name += $" {v} {number}";
                         } else {
@@ -171,6 +176,7 @@ namespace DSPRE.ROMFiles {
                     }
 
                     break;
+
                 default:
                     for (int i = 0; i < parametersList.Count; i++) {
                         name += $" {FormatNumber(parametersList[i])}";
@@ -202,7 +208,6 @@ namespace DSPRE.ROMFiles {
         private string FormatCmd_Overworld_Dir(List<byte[]> parametersList) {
             return $" {FormatNumber(parametersList[0], ParamTypeEnum.OW_ID)} {FormatNumber(parametersList[1], ParamTypeEnum.OW_DIRECTION)}";
         }
-
         public ScriptCommand(string wholeLine, int lineNumber = 0) {
             name = wholeLine;
             cmdParams = new List<byte[]>();
@@ -229,9 +234,8 @@ namespace DSPRE.ROMFiles {
                     return;
                 }
             }
-            /* Read parameters from remainder of the description */
-            //Console.WriteLine("ID = " + ((ushort)id).ToString("X4"));
 
+            /* Read parameters from remainder of the description */
             byte[] parametersSizeArr = RomInfo.ScriptCommandParametersDict[(ushort)id];
 
             int paramLength = 0;
@@ -440,8 +444,21 @@ namespace DSPRE.ROMFiles {
             return outp;
         }
 
+        private string FormatParameter(ScriptParameter param, ParamTypeEnum paramType = ParamTypeEnum.INTEGER) {
+            // For jump-to-label parameters, return the label name
+            if (param.Type == ScriptParameter.ParameterType.RelativeJump && !string.IsNullOrEmpty(param.TargetLabel)) {
+                return param.TargetLabel;
+            }
+
+            // Otherwise handle the numeric value
+            return FormatNumber(param.RawData, paramType);
+        }
         public override string ToString() {
             return name + " (" + ((ushort)id).ToString("X") + ")";
+        }
+
+        private string FormatLabelReference(string labelName) {
+            return labelName;
         }
     }
 }
