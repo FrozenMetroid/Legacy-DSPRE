@@ -1904,7 +1904,7 @@ namespace DSPRE.Resources {
             [0x00D9] = "TrainerTypeCheck",
             [0x00DA] = "TrainerMusic",
             [0x00DB] = "LostBattle",
-            [0x00DC] = "CheckBattleIsLost",
+            [0x00DC] = "CheckBattleVictory",
             [0x00DD] = "CheckDefeatedPokemon",
             [0x00DE] = "Check2vs2",
             [0x00DF] = "DummyTrainerBattle",
@@ -1936,6 +1936,10 @@ namespace DSPRE.Resources {
             [0x0118] = "SetLastWarp",
             [0x0119] = "CheckPlayerGender",
             [0x011A] = "HealPokemon",
+
+            [0x011F] = "TextUnionRoomTrainerClassOptions ",
+            [0x0120] = "CheckUnionRoomTrainerClass",
+            [0x0121] = "SetUnionRoomSprite",
 
             [0x0122] = "CheckPokedex",
             [0x0123] = "GivePokedex",
@@ -1985,8 +1989,11 @@ namespace DSPRE.Resources {
             [0x0158] = "SetOWDirection",
 
             [0x015C] = "WaitTimeOrAB",
+            [0x015D] = "ChoosePokemonSelection",
 
             [0x015F] = "GetSelectedPartySlot",
+
+            [0x0160] = "PokemonSummaryScreen",
 
             [0x0162] = "GetPartyPokemonID",
             [0x0163] = "CheckTradedPokemon",
@@ -2043,6 +2050,9 @@ namespace DSPRE.Resources {
             [0x01B3] = "SurvivePoison",
             [0x01B4] = "FinishOverworldScreen",
             [0x01B5] = "DummyGetVar",
+            [0x01B6] = "GetCommonMessageArchive",
+
+            [0x01B8] = "MessageFromArchive",
 
             [0x01BD] = "GetPreviousHeaderID",
             [0x01BE] = "GetCurrentHeaderID",
@@ -2076,6 +2086,10 @@ namespace DSPRE.Resources {
             [0x01E7] = "PCHealAnimation",
             [0x01E8] = "ElevatorAnimation",
             [0x01E9] = "MysteryGiftGive",
+            [0x01EA] = "Nop490",
+            [0x01EB] = "Nop491",
+
+            [0x01ED] = "EasyChat",
 
             [0x01EF] = "CheckVersion",
             [0x01F0] = "FirstPokemonInParty",
@@ -2113,6 +2127,7 @@ namespace DSPRE.Resources {
 
             [0x022C] = "TakeBP",
             [0x022D] = "CheckBP",
+            [0x022E] = "CheckUnionRoomTrainerSprite",
 
             [0x0231] = "ShakeCamera",
             [0x0232] = "Battle2vs2",
@@ -2142,7 +2157,7 @@ namespace DSPRE.Resources {
 
             [0x0267] = "TakePhoto",
 
-            [0x026A] = "CheckAlbumPhoto",
+            [0x026A] = "CheckIfAlbumIsFull",
 
             [0x026D] = "UpdateStarterSelectionMachine",
             [0x026E] = "GetOWDirection",
@@ -2154,7 +2169,11 @@ namespace DSPRE.Resources {
             [0x0289] = "ScratchOffScreen",
             [0x028A] = "ReleaseScriptApp",
 
+            [0x028C] = "GetTutorPageQuantity",
+
             [0x0290] = "CheckHeadbuttCompatibility",
+
+            [0x029A] = "GetCurrentMusic",
 
             [0x029D] = "GetItemQuantity",
 
@@ -2176,10 +2195,12 @@ namespace DSPRE.Resources {
 
             [0x02D3] = "BoatAnimation",
 
+            [0x02D7} = "GetFirstAlivePokemon"]
 
             [0x02D9] = "CheckPokemonAlive",
-            [0x02DA] = "CheckFollowingPoke",
+            [0x02DA] = "CheckNoFollowingPoke",
 
+            [0x02DC] = "AdjustFollowingPokeMood",
             [0x02DD] = "GetBornPokemonPartyPos",
 
             [0x02EA] = "OpenTouchScreen",
@@ -2189,6 +2210,7 @@ namespace DSPRE.Resources {
             [0x02EE] = "MultiTouchLocalText",
             [0x02EF] = "CreateMultiTouchBox",
             [0x02F0] = "CloseMultiTouch",
+            [0x02F1] = "CheckRockSmashItem",
 
             [0x02F3] = "LegendaryBellAnimationBegin",
             [0x02F4] = "LegendaryBellAnimationEnd",
@@ -2511,7 +2533,7 @@ namespace DSPRE.Resources {
             [0x011C] = new byte[1] { 0 },
             [0x011D] = new byte[] { 2, 2 },
             [0x011E] = new byte[] { 2 },
-            [0x011F] = new byte[] { 2, 2 },
+            [0x011F] = new byte[] { 0 },
             [0x0120] = new byte[] { 2, 2 },
             [0x0121] = new byte[] { 2 },
             [0x0122] = new byte[] { 2 },

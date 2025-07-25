@@ -1513,6 +1513,7 @@ namespace DSPRE.Resources {
                     [new List<uint> { 707 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { 708 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { 767 }] = (Color.SteelBlue, Color.White),
+                    [new List<uint> { 795 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { 821 }] = (Color.SteelBlue, Color.White),
                     [new List<uint> { 823 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { 824 }] = (Color.ForestGreen, Color.White),
@@ -1528,6 +1529,13 @@ namespace DSPRE.Resources {
                     [new List<uint> { 850 }] = (Color.ForestGreen, Color.White),
                     [new List<uint> { 851 }] = (Color.SteelBlue, Color.White),
                     [new List<uint> { 869 }] = (Color.ForestGreen, Color.White),
+                    [new List<uint> { 879 }] = (Color.ForestGreen, Color.White),
+                    [new List<uint> { 880 }] = (Color.ForestGreen, Color.White),
+                    [new List<uint> { 884 }] = (Color.Sienna, Color.White),
+                    [new List<uint> { 886 }] = (Color.Sienna, Color.White),
+                    [new List<uint> { 887 }] = (Color.Sienna, Color.White),
+                    [new List<uint> { 889 }] = (Color.Sienna, Color.White),
+                    [new List<uint> { 890 }] = (Color.Sienna, Color.White),
                     [new List<uint> { GameMatrix.EMPTY }] = (Color.Black, Color.White)
                 };
                 public static Dictionary<List<uint>, (Color back, Color fore)> GenericMatrixColorsDict = new Dictionary<List<uint>, (Color back, Color fore)> {
