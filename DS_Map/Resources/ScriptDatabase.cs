@@ -1867,7 +1867,7 @@ namespace DSPRE.Resources {
             [0x00B4] = "FlyAnimation",
             [0x00B5] = "FlashAnimation",
             [0x00B6] = "WhirlpoolAnimation",
-            [0x00B7] = "CutAnimation",
+            [0x00B7] = "HiddenMachineSummon",
             [0x00B8] = "CheckBike",
             [0x00B9] = "RideBike",
             [0x00BA] = "CyclingRoad",
@@ -2035,6 +2035,7 @@ namespace DSPRE.Resources {
             [0x018E] = "GetPartyPokemonMove",
             [0x018F] = "TextPartyPokemonMove",
             [0x0190] = "Strength",
+            [0x0191] = "Flash",
 
             [0x01A7] = "CheckCompleteJohtoDex",
             [0x01A8] = "CheckCompleteNationalDex",
@@ -2129,6 +2130,7 @@ namespace DSPRE.Resources {
             [0x022D] = "CheckBP",
             [0x022E] = "CheckUnionRoomTrainerSprite",
 
+            [0x0230] = "HiddenMachineEffect",
             [0x0231] = "ShakeCamera",
             [0x0232] = "Battle2vs2",
 
@@ -2195,13 +2197,14 @@ namespace DSPRE.Resources {
 
             [0x02D3] = "BoatAnimation",
 
-            [0x02D7} = "GetFirstAlivePokemon"]
-
+            [0x02D7] = "GetFollowingPokePartySlot",
+            [0x02D8] = "FollowingPokeFlash",
             [0x02D9] = "CheckPokemonAlive",
             [0x02DA] = "CheckNoFollowingPoke",
 
             [0x02DC] = "AdjustFollowingPokeMood",
-            [0x02DD] = "GetBornPokemonPartyPos",
+            [0x02DD] = "CheckFollowingPokeType",
+            [0x02DE] = "FollowingPokeJump",
 
             [0x02EA] = "OpenTouchScreen",
             [0x02EB] = "CloseTouchScreen",
