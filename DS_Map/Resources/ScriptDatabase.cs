@@ -2074,6 +2074,8 @@ namespace DSPRE.Resources {
             [0x01C4] = "ShowPokemonPic",
             [0x01C5] = "HidePokemonPic",
 
+            [0x01CF] = "EnableMassOutbreaks",
+
             [0x01D0] = "AddRoamingPokemon",
             [0x01D1] = "UnionGroup",
 
@@ -2155,6 +2157,7 @@ namespace DSPRE.Resources {
             [0x0253] = "ScopeMode",
             [0x0254] = "GetFollowingPokeSize",
 
+            [0x0256] = "SwapFollowingPokeAndPlayerPosition",
             [0x0257] = "FollowingPokePCAnimation",
             [0x0258] = "SendBackFollowingPoke",
             [0x0259] = "FollowingPokeFacePlayer",
@@ -2185,6 +2188,8 @@ namespace DSPRE.Resources {
 
             [0x0290] = "CheckHeadbuttCompatibility",
 
+            [0x0297] = "StartWifiPlaza",
+
             [0x029A] = "GetCurrentMusic",
 
             [0x029D] = "GetItemQuantity",
@@ -2211,7 +2216,7 @@ namespace DSPRE.Resources {
             [0x02D8] = "FollowingPokeFlash",
             [0x02D9] = "CheckPokemonAlive",
             [0x02DA] = "CheckNoFollowingPoke",
-
+            [0x02DB] = "SetFollowingPokeStrength",
             [0x02DC] = "AdjustFollowingPokeMood",
             [0x02DD] = "CheckFollowingPokeType",
             [0x02DE] = "FollowingPokeJump",
@@ -2224,7 +2229,7 @@ namespace DSPRE.Resources {
             [0x02EF] = "CreateMultiTouchBox",
             [0x02F0] = "CloseMultiTouch",
             [0x02F1] = "CheckRockSmashItem",
-
+            [0x02F2] = "HeadbuttEncounter",
             [0x02F3] = "LegendaryBellAnimationBegin",
             [0x02F4] = "LegendaryBellAnimationEnd",
             [0x02F5] = "LegendaryBellRiseFromBag",
@@ -2236,6 +2241,12 @@ namespace DSPRE.Resources {
             [0x0306] = "ShowLegendaryWing",
 
             [0x0310] = "OverlayManager",
+            [0x0311] = "BugContestControl",
+            [0x0312] = "TextBugContestPlacement",
+            [0x0313] = "BugContestResults",
+            [0x0314] = "TextBugContestPokeNickname",
+            [0x0315] = "TextBugContestRemainingTime",
+            [0x0316] = "CheckBugContestParticipant",
 
             [0x031B] = "ShowMomMoney",
             [0x031C] = "HideMomMoney",
@@ -2243,6 +2254,7 @@ namespace DSPRE.Resources {
             [0x032D] = "CheckMomGift",
 
             [0x033C] = "AddContestStat",
+            [0x033D] = "CheckFollowingPokeNextToPlayer",
 
             [0x0344] = "CheckJadeOrbRequirements",
 
@@ -3079,7 +3091,7 @@ namespace DSPRE.Resources {
             [0x030E] = new byte[1] { 0 },
             [0x030F] = new byte[] { 1 },
             [0x0310] = new byte[] { 1, 1 },
-            [0x0311] = new byte[] { 2, 1 },
+            [0x0311] = new byte[] { 1, 2 },
             [0x0312] = new byte[] { 1 },
             [0x0313] = new byte[] { 2, 2, 2 },
             [0x0314] = new byte[] { 1, 2 },
