@@ -102,6 +102,8 @@
     <Compile Include="AddressHelper.Designer.cs">
       <DependentUpon>AddressHelper.cs</DependentUpon>
     </Compile>
+    <Compile Include="AppLogger.cs" />
+    <Compile Include="CrashReporter.cs" />
     <Compile Include="DocTool.cs" />
     <Compile Include="DSUtils\ARM9.cs" />
     <Compile Include="DSUtils\DSUtils.cs" />
@@ -117,9 +119,29 @@
     <Compile Include="DVCalculator\DVCalcNatureViewerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DVCalculator\DVCalcNatureViewerForm.Designer.cs" />
+    <Compile Include="DVCalculator\DVCalcNatureViewerForm.Designer.cs">
+      <DependentUpon>DVCalcNatureViewerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="DVCalculator\DVCalculator.cs" />
     <Compile Include="EditorPanels.cs" />
+    <Compile Include="Editors\BtxEditor\BtxEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\BtxEditor\BtxEditor.Designer.cs">
+      <DependentUpon>BtxEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\BtxEditor\BtxExitConfirmation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\BtxEditor\BtxExitConfirmation.Designer.cs">
+      <DependentUpon>BtxExitConfirmation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\CameraEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\CameraEditor.Designer.cs">
+      <DependentUpon>CameraEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editors\EncountersEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -138,6 +160,7 @@
     <Compile Include="Editors\HeadbuttEncounterEditorTab.Designer.cs">
       <DependentUpon>HeadbuttEncounterEditorTab.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\Utils\IndexedBitmapHandler.cs" />
     <Compile Include="Editors\ItemEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -159,7 +182,18 @@
     <Compile Include="Editors\MoveDataEditor.designer.cs">
       <DependentUpon>MoveDataEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\PokemonSpriteEditor.cs" />
+    <Compile Include="Editors\NsbtxEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\NsbtxEditor.Designer.cs">
+      <DependentUpon>NsbtxEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\PokemonSpriteEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\PokemonSpriteEditor.Designer.cs">
+      <DependentUpon>PokemonSpriteEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editors\SafariZoneEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -190,12 +224,32 @@
     <Compile Include="Editors\SpriteCropper.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\WeatherEditor.cs">
+    <Compile Include="Editors\TableEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\TableEditor.Designer.cs">
+      <DependentUpon>TableEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\TextEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\TextEditor.Designer.cs">
+      <DependentUpon>TextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\TradeEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Editors\WeatherEditor.Designer.cs">
-      <DependentUpon>WeatherEditor.cs</DependentUpon>
+    <Compile Include="Editors\TradeEditor.Designer.cs">
+      <DependentUpon>TradeEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\TrainerEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\TrainerEditor.Designer.cs">
+      <DependentUpon>TrainerEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\Utils\NarcReader.cs" />
+    <Compile Include="Editors\Utils\SpriteSet.cs" />
     <Compile Include="EventFileImport.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -217,6 +271,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FlyEditor\FlyEditor.Designer.cs" />
+    <Compile Include="LibNDSFormats\BTX0.cs" />
     <Compile Include="GameCamera.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="InputComboBox.cs">
@@ -251,6 +306,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ReopenProjectConfirmation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReopenProjectConfirmation.Designer.cs">
+      <DependentUpon>ReopenProjectConfirmation.cs</DependentUpon>
     </Compile>
     <Compile Include="Resources\ROMToolboxDB\ToolboxDB.cs" />
     <Compile Include="Resources\ScriptDatabase.cs" />
@@ -299,6 +360,7 @@
     <Compile Include="ROMFiles\LevelScriptTrigger.cs" />
     <Compile Include="ROMFiles\MapScreenLoadTrigger.cs" />
     <Compile Include="ROMFiles\ScriptAction.cs" />
+    <Compile Include="ROMFiles\TradeData.cs" />
     <Compile Include="Script\ScriptCommandPosition.cs" />
     <Compile Include="Script\ScriptLabeledSection.cs" />
     <Compile Include="Script\ScriptParameter.cs" />
@@ -328,7 +390,7 @@
     </Compile>
     <Compile Include="ScintillaUtils\SearchManager.cs" />
     <Compile Include="ROMFiles\VariableValueTrigger.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="SettingsManager.cs" />
     <Compile Include="SettingsWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -341,7 +403,7 @@
     <Compile Include="Editors\SpawnEditor.Designer.cs">
       <DependentUpon>SpawnEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="UniqueList.cs" />
+    <Compile Include="Editors\Utils\UniqueList.cs" />
     <Compile Include="Editors\WildEditorHGSS.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -426,7 +488,18 @@
     <EmbeddedResource Include="DVCalculator\DVCalc.resx">
       <DependentUpon>DVCalc.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DVCalculator\DVCalcNatureViewerForm.resx" />
+    <EmbeddedResource Include="DVCalculator\DVCalcNatureViewerForm.resx">
+      <DependentUpon>DVCalcNatureViewerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\BtxEditor\BtxEditor.resx">
+      <DependentUpon>BtxEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\BtxEditor\BtxExitConfirmation.resx">
+      <DependentUpon>BtxExitConfirmation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\CameraEditor.resx">
+      <DependentUpon>CameraEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editors\EncountersEditor.resx">
       <DependentUpon>EncountersEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -445,6 +518,12 @@
     <EmbeddedResource Include="Editors\MoveDataEditor.resx">
       <DependentUpon>MoveDataEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editors\NsbtxEditor.resx">
+      <DependentUpon>NsbtxEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\PokemonSpriteEditor.resx">
+      <DependentUpon>PokemonSpriteEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editors\SafariZoneEditor.resx">
       <DependentUpon>SafariZoneEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -456,6 +535,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\ScriptEditor.resx">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\TableEditor.resx">
+      <DependentUpon>TableEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\TextEditor.resx">
+      <DependentUpon>TextEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\TradeEditor.resx">
+      <DependentUpon>TradeEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\TrainerEditor.resx">
+      <DependentUpon>TrainerEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EventFileImport.resx">
       <DependentUpon>EventFileImport.cs</DependentUpon>
@@ -478,6 +569,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\PokemonEditor.resx">
       <DependentUpon>PokemonEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ReopenProjectConfirmation.resx">
+      <DependentUpon>ReopenProjectConfirmation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\ROMToolboxDB\BDHCAMPatchDB.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -517,15 +611,9 @@
     <EmbeddedResource Include="Editors\WildEditorDPPt.resx">
       <DependentUpon>WildEditorDPPt.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <EmbeddedResource Include="SettingsWindow.resx">
+      <DependentUpon>SettingsWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Resources\HGSSCommands.md" />
     <None Include="Resources\ROMToolboxDB\CPUE_cam.bin" />
     <None Include="Resources\ROMToolboxDB\CPUS_cam.bin" />
@@ -705,6 +793,7 @@
     <None Include="Resources\Graphics\Program Icons\open_rom.png" />
     <None Include="Resources\Graphics\Program Icons\questionMark.png" />
     <None Include="Resources\Graphics\Program Icons\narcToFolderIcon.png" />
+    <Content Include="Resources\Graphics\Program Icons\popout.png" />
     <Content Include="Resources\Graphics\Program Icons\resetColorTable.png" />
     <None Include="Resources\Graphics\Program Icons\wideLensImage.png" />
     <None Include="Resources\Graphics\Program Icons\wideLensImageTransp.png" />
@@ -789,6 +878,9 @@
     </PackageReference>
     <PackageReference Include="System.Collections.Specialized">
       <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="Velopack">
+      <Version>0.0.1298</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

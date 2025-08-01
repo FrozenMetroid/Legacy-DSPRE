@@ -1,20 +1,26 @@
-﻿using System;
+﻿using DSPRE.ROMFiles;
+using Ekona.Images;
+using Images;
+using LibNDSFormats.NSBMD;
+using LibNDSFormats.NSBTX;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using NSMBe4.DSFileSystem;
+using ScintillaNET;
+using ScintillaNET.Utils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tao.OpenGl;
-using LibNDSFormats.NSBMD;
-using LibNDSFormats.NSBTX;
-using DSPRE.ROMFiles;
-using Images;
-using Ekona.Images;
-using ScintillaNET;
-using ScintillaNET.Utils;
 using Tao.Platform.Windows;
-using NSMBe4.DSFileSystem;
+using Velopack;
+using Velopack.Sources;
+using static DSPRE.RomInfo;
 
 namespace DSPRE {
     public static class Helpers {
@@ -30,6 +36,37 @@ namespace DSPRE {
         public static void Initialize(MainProgram mainProgram) {
             MainProgram = mainProgram;
             mapRenderer = new NSBMDGlRenderer();
+        }
+
+        public static void CheckForUpdates(bool silent = true)
+        {
+            AppLogger.Info("Checking for updates...");
+            var mgr = new UpdateManager(new GithubSource("https://github.com/Mixone-FinallyHere/DS-Pokemon-Rom-Editor", "", prerelease: false));
+
+            var newVersion = mgr.CheckForUpdates();
+            if (newVersion == null)
+            {
+                AppLogger.Info("No updates available.");
+                if (!silent)
+                    MessageBox.Show("No update is available.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            else
+            {
+                DialogResult update = MessageBox.Show($"A new DSPRE version is available: {newVersion.TargetFullRelease.Version}.\nDo you want to install it?", "New update", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                if (update == DialogResult.Yes)
+                {
+                    AppLogger.Info($"New version available: {newVersion.TargetFullRelease.Version} (Current: {mgr.CurrentVersion})");
+                    mgr.DownloadUpdates(newVersion);
+
+                    AppLogger.Info($"Installing update {newVersion.TargetFullRelease.Version} and restarting app...");
+                    mgr.ApplyUpdatesAndRestart(newVersion);
+                }
+                else
+                {
+                    AppLogger.Info("User declined to update the application.");
+                }
+            }
         }
 
         static bool disableHandlersOld;
@@ -52,6 +89,12 @@ namespace DSPRE {
 
         public static void EnableHandlers() {
             disableHandlers = false;
+        }
+
+        public static string GetDSPREVersion()
+        {
+            return "" + Assembly.GetExecutingAssembly().GetName().Version.Major + "." + Assembly.GetExecutingAssembly().GetName().Version.Minor +
+                "." + Assembly.GetExecutingAssembly().GetName().Version.Build;
         }
 
         public static void statusLabelMessage(string msg = "Ready") {
@@ -375,5 +418,338 @@ namespace DSPRE {
 
             return internalNames;
         }
+
+        public static int CalculateTimeDifferenceInSeconds(int startHour, int startMinute, int startSecond, int endHour, int endMinute, int endSecond)
+        {
+            // Convert start time and end time to seconds since midnight
+            int startTimeInSeconds = (startHour * 3600) + (startMinute * 60) + startSecond;
+            int endTimeInSeconds = (endHour * 3600) + (endMinute * 60) + endSecond;
+
+            // Calculate difference
+            int timeDifference = endTimeInSeconds - startTimeInSeconds;
+
+            // If time difference is negative (end time is past midnight), adjust
+            if (timeDifference < 0)
+            {
+                timeDifference += 24 * 3600; // Add 24 hours in seconds
+            }
+
+            return timeDifference;
+        }
+
+        public static String formatTime(int time)
+        {
+            string stringTime = time.ToString();
+            if (time < 10)
+            {
+                stringTime = "0" + stringTime;
+            }
+
+            return stringTime;
+        }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        extern static bool DestroyIcon(IntPtr handle);
+
+
+        public static void PopOutEditor<T>(T control, string title, Image icon, Action<T> onClose = null) where T : Control
+        {
+            var originalParent = control.Parent;
+            var originalIndex = originalParent?.Controls.IndexOf(control) ?? -1;
+
+            originalParent?.Controls.Remove(control);
+            Icon _icon = null;
+            if(icon != null)
+            {
+                Bitmap bitmap = new Bitmap(icon);
+                _icon = Icon.FromHandle(bitmap.GetHicon());
+            }
+        
+
+            var form = new Form
+            {
+                Text = title,
+                StartPosition = FormStartPosition.CenterScreen,
+                FormBorderStyle = FormBorderStyle.FixedSingle,
+                MaximizeBox = false,
+                ClientSize = control.Size,
+                ShowIcon = icon == null ? false : true,
+                Icon = _icon
+                
+            };
+
+            control.Dock = DockStyle.Fill;
+            form.Controls.Add(control);
+
+            form.FormClosing += (s, e) =>
+            {
+                form.Controls.Remove(control);
+                if(_icon != null)
+                {
+                    DestroyIcon(_icon.Handle);
+                }
+                if (originalParent != null && !originalParent.IsDisposed)
+                {
+                    if (originalIndex >= 0 && originalIndex <= originalParent.Controls.Count)
+                        originalParent.Controls.Add(control);
+                    else
+                        originalParent.Controls.Add(control);
+
+                    originalParent.Controls.SetChildIndex(control, originalIndex);
+                }
+
+                onClose?.Invoke(control);
+            };
+
+            form.Show();
+        }
+
+        public static void ExclusiveCBInvert(CheckBox cb)
+        {
+            if (Helpers.HandlersDisabled)
+            {
+                return;
+            }
+
+            Helpers.DisableHandlers();
+
+            if (cb.Checked)
+            {
+                cb.Checked = !cb.Checked;
+            }
+
+            Helpers.EnableHandlers();
+        }
+
+        public static void ContentBasedBatchRename(MainProgram parent, DirectoryInfo d = null)
+        {
+            (DirectoryInfo d, FileInfo[] files) dirData = OpenNonEmptyDir(d, title: "Content-Based Batch Rename Tool");
+            d = dirData.d;
+            FileInfo[] files = dirData.files;
+
+            if (d == null || files == null)
+            {
+                return;
+            }
+
+            DialogResult dr = MessageBox.Show("About to rename " + files.Length + " file" + (files.Length > 1 ? "s" : "") +
+                " from the input folder (taken in ascending order), according to their content.\n" +
+                "If a destination file already exists, DSPRE will append a number to its name.\n\n" +
+                "Do you want to proceed?", "Confirm operation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (dr.Equals(DialogResult.Yes))
+            {
+                List<string> enumerationFile = new List<string> {
+                    "#============================================================================",
+                    "# File enumeration definition for folder " + "\"" + d.Name + "\"",
+                    "#============================================================================"
+                };
+                int initialLength = enumerationFile.Count;
+
+                const byte toRead = 16;
+                foreach (FileInfo f in files)
+                {
+                    Console.WriteLine(f.Name);
+
+                    string fileNameOnly = Path.GetFileNameWithoutExtension(f.FullName);
+                    string dirNameOnly = Path.GetDirectoryName(f.FullName);
+
+                    string destName = "";
+                    byte[] b = DSUtils.ReadFromFile(f.FullName, 0, toRead);
+
+                    if (b == null || b.Length < toRead)
+                    {
+                        continue;
+                    }
+
+                    string magic = "";
+
+                    if (b[0] == 'B' && b[3] == '0')
+                    { //B**0
+                        ushort nameOffset;
+
+                        destName = dirNameOnly + "\\"; //Full filename can be changed
+                        nameOffset = (ushort)(52 + (4 * (BitConverter.ToUInt16(b, 0xE) - 1)));
+
+                        if (b[1] == 'T' && b[2] == 'X')
+                        { //BTX0
+#if false
+                            nameOffset += 0xEC;
+#else
+                            destName = fileNameOnly;
+#endif
+                        }
+
+                        string nameRead = Encoding.UTF8.GetString(DSUtils.ReadFromFile(f.FullName, nameOffset, 16)).TrimEnd(new char[] { (char)0 });
+
+                        if (nameRead.Length <= 0 || nameRead.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                        {
+                            destName = fileNameOnly; //Filename can't be changed, only extension
+                        }
+                        else
+                        {
+                            destName += nameRead;
+                        }
+
+                        destName += ".ns";
+                        for (int i = 0; i < 3; i++)
+                        {
+                            magic += Char.ToLower((char)b[i]);
+                        }
+                    }
+                    else
+                    {
+                        destName = fileNameOnly + ".";
+                        byte offset = 0;
+
+                        if (b[5] == 'R' && b[8] == 'N')
+                        {
+                            offset = 5;
+                        }
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            magic += Char.ToLower((char)b[offset + i]);
+                        }
+                    }
+
+                    if (string.IsNullOrWhiteSpace(magic) || !magic.All(char.IsLetterOrDigit))
+                    {
+                        continue;
+                    }
+
+                    destName += magic;
+
+                    if (string.IsNullOrWhiteSpace(destName))
+                    {
+                        continue;
+                    }
+
+                    destName = MakeUniqueName(destName, fileNameOnly = null, dirNameOnly);
+                    System.IO.File.Move(f.FullName, Path.Combine(Path.GetDirectoryName(f.FullName), Path.GetFileName(destName)));
+
+                    enumerationFile.Add(Path.GetFileName(destName));
+                }
+
+                if (enumerationFile.Count > initialLength)
+                {
+                    MessageBox.Show("Files inside folder \"" + d.FullName + "\" have been renamed according to their contents.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    DialogResult response = MessageBox.Show("Do you want to save a file enumeration list?", "Waiting for user", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (response.Equals(DialogResult.Yes))
+                    {
+                        MessageBox.Show("Choose where to save the output list file.", "Name your list file", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                        SaveFileDialog sf = new SaveFileDialog
+                        {
+                            Filter = "List File (*.txt; *.list)|*.txt;*.list",
+                            FileName = d.Name + ".list"
+                        };
+                        if (sf.ShowDialog(parent) != DialogResult.OK)
+                        {
+                            return;
+                        }
+
+                        System.IO.File.WriteAllLines(sf.FileName, enumerationFile);
+                        MessageBox.Show("List file saved.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No file content could be recognized.", "Operation terminated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+        }
+
+        public static (DirectoryInfo, FileInfo[]) OpenNonEmptyDir(DirectoryInfo d = null, string title = "Waiting for user")
+        {
+            /*==================================================================*/
+            if (d == null)
+            {
+                MessageBox.Show("Choose a source folder.", title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                CommonOpenFileDialog sourceDirDialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = true,
+                    Multiselect = false
+                };
+
+                if (sourceDirDialog.ShowDialog() != CommonFileDialogResult.Ok)
+                {
+                    return (null, null);
+                }
+
+                d = new DirectoryInfo(sourceDirDialog.FileName);
+            }
+
+            FileInfo[] tempfiles = d.GetFiles();
+            FileInfo[] files = tempfiles.OrderBy(n => System.Text.RegularExpressions.Regex.Replace(n.Name, @"\d+", e => e.Value.PadLeft(tempfiles.Length.ToString().Length, '0'))).ToArray();
+
+            if (files.Length <= 0)
+            {
+                MessageBox.Show("Folder " + "\"" + d.FullName + "\"" + " is empty.\nCan't proceed.", "Invalid folder", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return (null, null);
+            };
+
+            return (d, files);
+        }
+
+        public static string MakeUniqueName(string fileName, string fileNameOnly = null, string dirNameOnly = null, string extension = null)
+        {
+            if (fileNameOnly == null)
+            {
+                fileNameOnly = Path.GetFileNameWithoutExtension(fileName);
+            }
+            if (dirNameOnly == null)
+            {
+                dirNameOnly = Path.GetDirectoryName(fileName);
+            }
+            if (extension == null)
+            {
+                extension = Path.GetExtension(fileName);
+            }
+
+            int append = 1;
+
+            while (System.IO.File.Exists(Path.Combine(dirNameOnly, fileName)))
+            {
+                string tmp = fileNameOnly + "(" + (append++) + ")";
+                fileName = Path.Combine(dirNameOnly, tmp + extension);
+            }
+            return fileName;
+        }
+
+        public static void ExportTrainerUsageToCSV(Dictionary<string, Dictionary<string, int>> trainerUsage, string csvFilePath)
+        {
+            // Create the StreamWriter to write data to the CSV file
+            var sortedTrainerClasses = trainerUsage.Keys.OrderBy(className => className);
+
+            using (StreamWriter sw = new StreamWriter(csvFilePath))
+            {
+                // Write the header row
+                sw.WriteLine("Trainer Class;Pokemon Name;Occurrences");
+
+                // Iterate over the sorted trainer class names
+                foreach (string className in sortedTrainerClasses)
+                {
+                    Dictionary<string, int> innerDict = trainerUsage[className];
+
+                    // Sort the Pokemon names alphabetically
+                    var sortedPokemonNames = innerDict.Keys.OrderByDescending(pokeName => innerDict[pokeName]);
+
+                    // Iterate over the sorted mon names
+                    foreach (string pokeName in sortedPokemonNames)
+                    {
+                        int occurrences = innerDict[pokeName];
+
+                        // Write the data row
+                        sw.WriteLine($"{className};{pokeName};{occurrences}");
+                    }
+                    sw.WriteLine($"-;-;-");
+                }
+            }
+
+            Console.WriteLine("CSV file exported successfully.");
+        }
+
     }
 }

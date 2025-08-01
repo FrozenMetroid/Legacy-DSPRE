@@ -96,7 +96,7 @@ namespace DSPRE.Editors
             Update();
             DSUtils.TryUnpackNarcs(new List<RomInfo.DirNames> { RomInfo.DirNames.scripts }); //12 = scripts Narc Dir
             populate_selectScriptFileComboBox(0);
-            UpdateScriptNumberCheckBox((NumberStyles)Properties.Settings.Default.scriptEditorFormatPreference);
+            UpdateScriptNumberCheckBox((NumberStyles)SettingsManager.Settings.scriptEditorFormatPreference);
             Helpers.statusLabelMessage();
         }
         public void OpenScriptEditor(MainProgram parent, int scriptFileID)
@@ -116,6 +116,9 @@ namespace DSPRE.Editors
             secondaryKeyWords = String.Join(" ", RomInfo.ScriptComparisonOperatorsDict.Values) +
                                 " " + String.Join(" ", ScriptDatabase.specialOverworlds.Values) +
                                 " " + String.Join(" ", ScriptDatabase.overworldDirections.Values) +
+                                " " + String.Join(" ", ScriptDatabase.pokemonNames.Values) +
+                                " " + String.Join(" ", ScriptDatabase.itemNames.Values) +
+                                " " + String.Join(" ", ScriptDatabase.moveNames.Values) +
                                 " " + ScriptFile.ContainerTypes.Script.ToString() +
                                 " " + ScriptFile.ContainerTypes.Function.ToString() +
                                 " " + ScriptFile.ContainerTypes.Action.ToString() +
@@ -414,8 +417,8 @@ namespace DSPRE.Editors
         public void UpdateScriptNumberCheckBox(NumberStyles toSet)
         {
             Helpers.DisableHandlers();
-            Properties.Settings.Default.scriptEditorFormatPreference = (int)toSet;
-            switch ((NumberStyles)Properties.Settings.Default.scriptEditorFormatPreference)
+            SettingsManager.Settings.scriptEditorFormatPreference = (int)toSet;
+            switch ((NumberStyles)SettingsManager.Settings.scriptEditorFormatPreference)
             {
                 case NumberStyles.None:
                     scriptEditorNumberFormatNoPreference.Checked = true;
@@ -427,15 +430,15 @@ namespace DSPRE.Editors
                     scriptEditorNumberFormatDecimal.Checked = true;
                     break;
             }
-            Console.WriteLine("changed style to " + Properties.Settings.Default.scriptEditorFormatPreference);
+            Console.WriteLine("changed style to " + SettingsManager.Settings.scriptEditorFormatPreference);
             Helpers.EnableHandlers();
         }
         private void UpdateScriptNumberFormat(NumberStyles numberStyle)
         {
             if (Helpers.HandlersEnabled)
             {
-                NumberStyles old = (NumberStyles)Properties.Settings.Default.scriptEditorFormatPreference; //Local Backup
-                Properties.Settings.Default.scriptEditorFormatPreference = (int)numberStyle;
+                NumberStyles old = (NumberStyles)SettingsManager.Settings.scriptEditorFormatPreference; //Local Backup
+                SettingsManager.Settings.scriptEditorFormatPreference = (int)numberStyle;
                 if (!DisplayScript())
                 {
                     UpdateScriptNumberCheckBox(old); //Restore old checkbox status! Script couldn't be redrawn
@@ -736,6 +739,7 @@ namespace DSPRE.Editors
         {
             string path = Filesystem.GetScriptPath(selectScriptFileComboBox.SelectedIndex);
             Helpers.ExplorerSelect(path);
+
         }
         private void findNext(SearchManager searchManager)
         {

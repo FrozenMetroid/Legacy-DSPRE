@@ -743,6 +743,16 @@ namespace DSPRE.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DV_Icon {
+            get {
+                object obj = ResourceManager.GetObject("DV_Icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap enumToListIcon {
             get {
                 object obj = ResourceManager.GetObject("enumToListIcon", resourceCulture);
@@ -1366,6 +1376,16 @@ namespace DSPRE.Properties {
         internal static System.Drawing.Bitmap pasteIcon {
             get {
                 object obj = ResourceManager.GetObject("pasteIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap popout {
+            get {
+                object obj = ResourceManager.GetObject("popout", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

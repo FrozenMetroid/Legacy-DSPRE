@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,13 +38,19 @@ namespace DSPRE
 
         private String oldExportPath;
         private String oldMapImportPath;
+        private String oldOpenDefaultPath;
 
         private void SettingsWindow_Load(object sender, EventArgs e)
         {
-            romExportPathTextBox.Text = Properties.Settings.Default.exportPath;
-            oldExportPath = Properties.Settings.Default.exportPath;
-            mapImportPathTextBox.Text = Properties.Settings.Default.mapImportStarterPoint;
-            oldMapImportPath = Properties.Settings.Default.mapImportStarterPoint;
+            currentVersionLabel.Text = $"DSPRE Version {Helpers.GetDSPREVersion()}";
+            romExportPathTextBox.Text = SettingsManager.Settings.exportPath;
+            oldExportPath = SettingsManager.Settings.exportPath;
+            mapImportPathTextBox.Text = SettingsManager.Settings.mapImportStarterPoint;
+            oldMapImportPath = SettingsManager.Settings.mapImportStarterPoint;
+            openDefaultRomTextBox.Text = SettingsManager.Settings.openDefaultRom;
+            oldOpenDefaultPath = SettingsManager.Settings.openDefaultRom;
+            dontAskOpenCheckbox.Checked = SettingsManager.Settings.neverAskForOpening;
+
         }
 
         private void changePathButton1_Click(object sender, EventArgs e)
@@ -60,23 +67,36 @@ namespace DSPRE
             mapImportPathTextBox.Text = getFolderPath();
         }
 
+        private void changeOpenDefaultPathButton_Click(object sender, EventArgs e)
+        {
+            var defaultRomPath = getFolderPath();
+            if(defaultRomPath != null && !defaultRomPath.EndsWith("DSPRE_contents"))
+            {
+                if (MessageBox.Show("The folder you selected does not appear to be a DSPRE folder (DSPRE_contents), are you sure you want to proceed?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+
+            openDefaultRomTextBox.Text = defaultRomPath;
+        }
+
         private void saveButton_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.exportPath = romExportPathTextBox.Text;
-            Properties.Settings.Default.mapImportStarterPoint = mapImportPathTextBox.Text;
-            oldExportPath = Properties.Settings.Default.exportPath;
-            oldMapImportPath = Properties.Settings.Default.mapImportStarterPoint;
+            SettingsManager.Settings.exportPath = romExportPathTextBox.Text;
+            SettingsManager.Settings.mapImportStarterPoint = mapImportPathTextBox.Text;
+            SettingsManager.Settings.openDefaultRom = openDefaultRomTextBox.Text;
+            oldExportPath = SettingsManager.Settings.exportPath;
+            oldMapImportPath = SettingsManager.Settings.mapImportStarterPoint;
+            oldOpenDefaultPath = SettingsManager.Settings.openDefaultRom;
 
+            SettingsManager.Save();
         }
 
-        private void SettingsWindow_FormClosing_1(object sender, FormClosingEventArgs e)
-        {
-
-        }
 
         private void SettingsWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (oldMapImportPath != mapImportPathTextBox.Text || oldExportPath != romExportPathTextBox.Text)
+            if (oldMapImportPath != mapImportPathTextBox.Text || oldExportPath != romExportPathTextBox.Text || oldOpenDefaultPath != openDefaultRomTextBox.Text)
             {
                 if (MessageBox.Show("You still have unsaved modifications, are you sure you want to quit?", "Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 {
@@ -99,6 +119,20 @@ namespace DSPRE
         private void mapImportBasePathLabel_Click(object sender, EventArgs e)
         {
 
+        }
+        private void clearButtonOpenDefault_Click(object sender, EventArgs e)
+        {
+            openDefaultRomTextBox.Text = "";
+        }
+
+        private void dontAskOpenCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            SettingsManager.Settings.neverAskForOpening = dontAskOpenCheckbox.Checked;
+        }
+
+        private void checkForUpdatesButton_Click(object sender, EventArgs e)
+        {
+            Helpers.CheckForUpdates(false);
         }
     }
 }
