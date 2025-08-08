@@ -2130,6 +2130,8 @@ namespace DSPRE.Resources {
             [0x0211] = "GetFirstAlivePokemonSlot",
             [0x0212] = "SetMatrixAlternativeMap",
 
+            [0x0215] = "CheckCoinSpace",
+
             [0x0217] = "GetPokemonLevel",
 
             [0x021D] = "TextNumberSp",
@@ -2839,7 +2841,7 @@ namespace DSPRE.Resources {
             [0x0212] = new byte[] { 2, 1 },
             [0x0213] = new byte[] { 1, 2 },
             [0x0214] = new byte[] { 2, 2, 2 },
-            [0x0215] = new byte[] { 2, 2, 2 },
+            [0x0215] = new byte[] { 2, 4 },
             [0x0216] = new byte[] { 2 },
             [0x0217] = new byte[] { 2, 2 },
             [0x0218] = new byte[] { 2 },
