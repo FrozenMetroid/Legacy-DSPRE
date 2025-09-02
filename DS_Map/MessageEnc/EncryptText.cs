@@ -304,10 +304,6 @@ namespace DSPRE.MessageEnc
         private static int GetInitialKey(string filePath)
         {
             int initialKey = 0;
-            if (!File.Exists(filePath))
-            {
-                return initialKey;
-            }
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             using (BinaryReader reader = new BinaryReader(fileStream))
             {

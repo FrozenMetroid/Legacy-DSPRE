@@ -8,6 +8,7 @@ namespace DSPRE.Editors
     partial class PokemonSpriteEditor
     {
         private System.ComponentModel.IContainer components = null;
+        private ComboBox IndexBox;
         private ComboBox SaveBox;
         private ComboBox BasePalette;
         private ComboBox ShinyPalette;
@@ -240,7 +241,7 @@ namespace DSPRE.Editors
             this.femaleBackNormalPic.Size = new System.Drawing.Size(320, 160);
             this.femaleBackNormalPic.TabIndex = 14;
             this.femaleBackNormalPic.TabStop = false;
-            this.femaleBackNormalPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.femaleBackNormalPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // maleBackNormalPic
             // 
@@ -249,7 +250,7 @@ namespace DSPRE.Editors
             this.maleBackNormalPic.Size = new System.Drawing.Size(320, 160);
             this.maleBackNormalPic.TabIndex = 15;
             this.maleBackNormalPic.TabStop = false;
-            this.maleBackNormalPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.maleBackNormalPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // femaleFrontNormalPic
             // 
@@ -258,7 +259,7 @@ namespace DSPRE.Editors
             this.femaleFrontNormalPic.Size = new System.Drawing.Size(320, 160);
             this.femaleFrontNormalPic.TabIndex = 16;
             this.femaleFrontNormalPic.TabStop = false;
-            this.femaleFrontNormalPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.femaleFrontNormalPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // maleFrontNormalPic
             // 
@@ -267,7 +268,7 @@ namespace DSPRE.Editors
             this.maleFrontNormalPic.Size = new System.Drawing.Size(320, 160);
             this.maleFrontNormalPic.TabIndex = 17;
             this.maleFrontNormalPic.TabStop = false;
-            this.maleFrontNormalPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.maleFrontNormalPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // maleBackShinyPic
             // 
@@ -276,7 +277,7 @@ namespace DSPRE.Editors
             this.maleBackShinyPic.Size = new System.Drawing.Size(320, 160);
             this.maleBackShinyPic.TabIndex = 18;
             this.maleBackShinyPic.TabStop = false;
-            this.maleBackShinyPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.maleBackShinyPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // femaleBackShinyPic
             // 
@@ -285,7 +286,7 @@ namespace DSPRE.Editors
             this.femaleBackShinyPic.Size = new System.Drawing.Size(320, 160);
             this.femaleBackShinyPic.TabIndex = 19;
             this.femaleBackShinyPic.TabStop = false;
-            this.femaleBackShinyPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.femaleBackShinyPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // maleFrontShinyPic
             // 
@@ -294,7 +295,7 @@ namespace DSPRE.Editors
             this.maleFrontShinyPic.Size = new System.Drawing.Size(320, 160);
             this.maleFrontShinyPic.TabIndex = 20;
             this.maleFrontShinyPic.TabStop = false;
-            this.maleFrontShinyPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.maleFrontShinyPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // femaleFrontShinyPic
             // 
@@ -303,7 +304,7 @@ namespace DSPRE.Editors
             this.femaleFrontShinyPic.Size = new System.Drawing.Size(320, 160);
             this.femaleFrontShinyPic.TabIndex = 21;
             this.femaleFrontShinyPic.TabStop = false;
-            this.femaleFrontShinyPic.Click += new System.EventHandler(this.OpenPngs_Click);
+            this.femaleFrontShinyPic.Click += new System.EventHandler(this.Picturebox_Click);
             // 
             // PokemonSpriteEditor
             // 
@@ -359,6 +360,5 @@ namespace DSPRE.Editors
         private PictureBox femaleBackShinyPic;
         private PictureBox maleFrontShinyPic;
         private PictureBox femaleFrontShinyPic;
-        public ComboBox IndexBox;
     }
 }

@@ -23,10 +23,6 @@ namespace DSPRE
         public string mapImportStarterPoint { get; set; } = "";
         public string openDefaultRom { get; set; } = "";
         public bool neverAskForOpening { get; set; } = false;
-        public bool databasesPulled { get; set; } = false;
-        public bool automaticallyCheckForUpdates { get; set; } = true;
-        public bool automaticallyUpdateDBs { get; set; } = true;
-        public bool useDecompNames { get; set; } = false;
     }
 
     public static class SettingsManager

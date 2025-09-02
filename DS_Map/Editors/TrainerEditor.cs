@@ -123,7 +123,7 @@ namespace DSPRE.Editors
         {
             if (trainerSprite == null)
             {
-                AppLogger.Error("Sprite is null!");
+                Console.WriteLine("Sprite is null!");
                 return;
             }
 
@@ -854,9 +854,9 @@ namespace DSPRE.Editors
             trainerComboBox.Items[trainerComboBox.SelectedIndex] = editedTrainer;
             Helpers.EnableHandlers();
 
-            if (EditorPanels.eventEditor.eventEditorIsReady)
+            if (_parent.eventEditorIsReady)
             {
-                EditorPanels.eventEditor.owTrainerComboBox.Items[trainerComboBox.SelectedIndex] = editedTrainer;
+                _parent.owTrainerComboBox.Items[trainerComboBox.SelectedIndex] = editedTrainer;
             }
         }
 

@@ -151,7 +151,7 @@ namespace DSPRE {
                                 }
                                 break;
                             default:
-                                AppLogger.Error("Unrecognized operand!!!");
+                                Console.WriteLine("Unrecognized operand!!!");
                                 break;
                         }
                     }
@@ -220,7 +220,7 @@ namespace DSPRE {
                                 }
                                 break;
                             default:
-                                AppLogger.Error("Unrecognized operand!!!");
+                                Console.WriteLine("Unrecognized operand!!!");
                                 break;
                         }
                     }

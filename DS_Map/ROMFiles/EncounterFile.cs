@@ -139,7 +139,7 @@ namespace DSPRE.ROMFiles {
         public uint[] walkingPokemon = new uint[12];
 
         /* Time-specific encounters */
-        public uint[] dayPokemon = new uint[2];
+        public uint[] morningPokemon = new uint[2];
         public uint[] nightPokemon = new uint[2];
 
         /* Dual slot exclusives */
@@ -148,11 +148,6 @@ namespace DSPRE.ROMFiles {
         public uint[] emeraldPokemon = new uint[2];
         public uint[] fireRedPokemon = new uint[2];
         public uint[] leafGreenPokemon = new uint[2];
-
-        /* Form Data */
-        public uint[] regionalForms = new uint[5];
-        public uint unknownTable = 0;
-
         #endregion
 
         #region Constructors (1)
@@ -185,9 +180,9 @@ namespace DSPRE.ROMFiles {
                 /* Time-specific encounters */
                 for (int i = 0; i < 2; i++) {
                     try {
-                        dayPokemon[i] = reader.ReadUInt32();
+                        morningPokemon[i] = reader.ReadUInt32();
                     } catch {
-                        dayPokemon[i] = 0x00;
+                        morningPokemon[i] = 0x00;
                         fieldsWithErrors.Add("Morning encounters" + ' ' + '[' + i + ']' + msgFixed);
                     }
                 }
@@ -211,25 +206,7 @@ namespace DSPRE.ROMFiles {
                     }
                 }
 
-                /* Form data */
-                for (int i = 0; i < 5; i++) {
-                    try {
-                        regionalForms[i] = reader.ReadUInt32();
-                    } catch {
-                        regionalForms[i] = 0x00;
-                        fieldsWithErrors.Add("Form data" + ' ' + '[' + i + ']' + msgFixed);
-                    }
-                }
-
-                try
-                {
-                    unknownTable = reader.ReadUInt32();
-                }
-                catch
-                {
-                    unknownTable = 0x00;
-                    fieldsWithErrors.Add("Unknown table" + msgFixed);
-                }
+                reader.BaseStream.Position = 0xA4;
 
                 /* Dual-slot encounters */
                 for (int i = 0; i < 2; i++) {
@@ -365,7 +342,7 @@ namespace DSPRE.ROMFiles {
 
                 /* Time-specific encounters */
                 for (int i = 0; i < 2; i++) {
-                    writer.Write(dayPokemon[i]);
+                    writer.Write(morningPokemon[i]);
                 }
 
                 for (int i = 0; i < 2; i++) {

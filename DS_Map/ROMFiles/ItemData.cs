@@ -7,7 +7,6 @@ using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.
 
 namespace DSPRE.ROMFiles
 {
-    #region Enums
     public enum NaturalGiftType
     {
         Normal = 0,
@@ -320,7 +319,6 @@ namespace DSPRE.ROMFiles
         //HearthflameMask = 219
     }
 
-    #endregion
     public class ItemData : RomFile
     {
         public ushort price;
@@ -343,11 +341,11 @@ namespace DSPRE.ROMFiles
         public byte PartyUse;
         public ItemPartyUseParam PartyUseParam;
 
-        public int ID;
+        public int RealID;
 
         public ItemData(Stream stream, int ID)
         {
-            this.ID = ID;
+            RealID = ID > 112 ? ID + 22 : ID; // Adjust ID for unused items
             using (BinaryReader reader = new BinaryReader(stream))
             {
                 price = reader.ReadUInt16();

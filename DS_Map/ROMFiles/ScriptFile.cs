@@ -550,7 +550,7 @@ namespace DSPRE.ROMFiles
 
         private void addParametersToList(ref List<byte[]> parameterList, ushort id, BinaryReader dataReader)
         {
-            AppLogger.Debug("Loaded command id: " + id.ToString("X4"));
+            Console.WriteLine("Loaded command id: " + id.ToString("X4"));
             try
             {
                 foreach (int bytesToRead in RomInfo.ScriptCommandParametersDict[id])
@@ -589,65 +589,18 @@ namespace DSPRE.ROMFiles
             }
         }
 
-        private List<(int linenum, string text)> PreprocessLines(List<string> linelist)
+        private List<ScriptCommandContainer> ReadCommandsFromLines(List<string> linelist, ContainerTypes containerType, Func<List<(int linenum, string text)>, int, ushort?, bool> endConditions)
         {
             List<(int linenum, string text)> lineSource = new List<(int linenum, string text)>();
-            bool inBlockComment = false;
 
             for (int l = 0; l < linelist.Count; l++)
             {
-                string line = linelist[l];
-
-                // handle block comments first
-                if (inBlockComment)
+                string cur = linelist[l];
+                if (!string.IsNullOrWhiteSpace(cur))
                 {
-                    int endComment = line.IndexOf("*/");
-                    if (endComment >= 0)
-                    {
-                        line = line.Substring(endComment + 2);
-                        inBlockComment = false;
-                    }
-                    else
-                    {
-                        continue; 
-                    }
-                }
-
-                while (!inBlockComment && line.Contains("/*"))
-                {
-                    int startComment = line.IndexOf("/*");
-                    int endComment = line.IndexOf("*/", startComment);
-
-                    if (endComment >= 0)
-                    {
-                        line = line.Substring(0, startComment) + line.Substring(endComment + 2);
-                    }
-                    else
-                    {
-                        line = line.Substring(0, startComment);
-                        inBlockComment = true;
-                    }
-                }
-
-                int inlineComment = line.IndexOf("//");
-                if (inlineComment >= 0)
-                {
-                    line = line.Substring(0, inlineComment);
-                }
-
-                line = line.Trim();
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    lineSource.Add((l, line));
+                    lineSource.Add((l, cur));
                 }
             }
-
-            return lineSource;
-        }
-
-        private List<ScriptCommandContainer> ReadCommandsFromLines(List<string> linelist, ContainerTypes containerType, Func<List<(int linenum, string text)>, int, ushort?, bool> endConditions)
-        {
-            List<(int linenum, string text)> lineSource = PreprocessLines(linelist);
 
             List<ScriptCommandContainer> ls = new List<ScriptCommandContainer>();
             int i = 0;
@@ -1059,7 +1012,7 @@ namespace DSPRE.ROMFiles
                 }
                 catch (NullReferenceException nre)
                 {
-                    AppLogger.Error(nre.ToString());
+                    Console.WriteLine(nre);
                     return null;
                 }
             }
@@ -1077,11 +1030,11 @@ namespace DSPRE.ROMFiles
                 return false;
             }
 
-            AppLogger.Debug("Checking calls of function " + funcID + (excludedCaller == null ? "" : " excluding Function " + excludedCaller + " as the caller."));
+            Console.WriteLine("Checking calls of function " + funcID + (excludedCaller == null ? "" : " excluding Function " + excludedCaller + " as the caller."));
 
             if (!uninvokedFuncsSet.Contains(funcID))
             {
-                AppLogger.Debug("Function " + funcID + " has already been invoked before. Nothing to check.");
+                Console.WriteLine("Function " + funcID + " has already been invoked before. Nothing to check.");
                 return true; //Abort 
             }
 
@@ -1096,13 +1049,13 @@ namespace DSPRE.ROMFiles
 
             if (sr is null)
             {
-                AppLogger.Debug("No reference found!!!");
+                Console.WriteLine("No reference found!!!");
                 return false;
             }
 
             if (sr.typeOfCaller is ContainerTypes.Script)
             {
-                AppLogger.Debug("Function " + funcID + " is directly called by Script " + sr.callerID);
+                Console.WriteLine("Function " + funcID + " is directly called by Script " + sr.callerID);
                 return true;
             }
 
@@ -1110,12 +1063,12 @@ namespace DSPRE.ROMFiles
             {
                 if (FunctionIsInvoked(refList, uninvokedFuncsSet, sr.callerID, ++callCount, excludedCaller: sr.invokedID))
                 { //check if caller function is invoked as well
-                    AppLogger.Debug("Function " + funcID + " is called by Function " + sr.callerID);
+                    Console.WriteLine("Function " + funcID + " is called by Function " + sr.callerID);
                     return true;
                 }
             }
 
-            AppLogger.Debug("Function " + funcID + " is unused");
+            Console.WriteLine("Function " + funcID + " is unused");
             return false;
         }
 
