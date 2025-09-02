@@ -2242,6 +2242,8 @@ namespace DSPRE.Resources {
 
             [0x0306] = "ShowLegendaryWing",
 
+            [0x030C] = "VoltorbFlip",
+
             [0x0310] = "OverlayManager",
             [0x0311] = "BugContestControl",
             [0x0312] = "TextBugContestPlacement",
