@@ -1,77 +1,246 @@
-﻿using DSPRE.ROMFiles;
+﻿using DSPRE;
+using DSPRE.Resources;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+using System.Text.Json;
+using static DSPRE.RomInfo;
+
+public static class ScriptDatabaseJsonLoader
+{
+    /// <summary>
+    /// Call this once at startup (before any script‐lookups).
+    /// </summary>
+    public static void InitializeFromJson(string jsonPath, GameVersions gameVersion)
+    {
+        string expandedPath = Environment.ExpandEnvironmentVariables(jsonPath);
+        string text = File.ReadAllText(expandedPath);
+        JsonDocument doc = JsonDocument.Parse(text);
+        try
+        {
+            JsonElement root = doc.RootElement;
+
+            ScriptDatabase.movementsDict = root
+                .GetProperty("movements")
+                .EnumerateObject()
+                .ToDictionary(
+                    prop => Convert.ToUInt16(prop.Name.Substring(2), 16),
+                    prop => new MovementInfo
+                    {
+                        Name = prop.Value.GetProperty("name").GetString(),
+                        DecompName = prop.Value.GetProperty("decomp_name").GetString(),
+                        Description = prop.Value.GetProperty("description").GetString(),
+                    }
+                );
+
+            ScriptDatabase.comparisonOperatorsDict = root
+                .GetProperty("comparisonOperators")
+                .EnumerateObject()
+                .ToDictionary(
+                    prop => Convert.ToUInt16(prop.Name.Substring(2), 16),
+                    prop => prop.Value.GetString()
+                );
+
+            ScriptDatabase.specialOverworlds = root
+                .GetProperty("specialOverworlds")
+                .EnumerateObject()
+                .ToDictionary(
+                    prop => Convert.ToUInt16(prop.Name.Substring(2), 16),
+                    prop => prop.Value.GetString()
+                );
+
+            ScriptDatabase.overworldDirections = root
+                .GetProperty("overworldDirections")
+                .EnumerateObject()
+                .ToDictionary(
+                    prop => (byte)Convert.ToUInt16(prop.Name.Substring(2), 16),
+                    prop => prop.Value.GetString()
+                );
+
+            Dictionary<ushort, string> namesDict;
+            Dictionary<ushort, byte[]> paramsDict;
+
+            switch (gameVersion)
+            {
+                case GameVersions.Platinum:
+                    namesDict = ScriptDatabase.PlatScrCmdNames;
+                    paramsDict = ScriptDatabase.PlatScrCmdParameters;
+                    break;
+                case GameVersions.Diamond:
+                case GameVersions.Pearl:
+                    namesDict = ScriptDatabase.DPScrCmdNames;
+                    paramsDict = ScriptDatabase.DPScrCmdParameters;
+                    break;
+                case GameVersions.HeartGold:
+                case GameVersions.SoulSilver:
+                    namesDict = ScriptDatabase.HGSSScrCmdNames;
+                    paramsDict = ScriptDatabase.HGSSScrCmdParameters;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(gameVersion), gameVersion, "Unsupported game");
+            }
+
+            JsonElement scrRoot;
+            if (!root.TryGetProperty("scrcmd", out scrRoot))
+                throw new InvalidOperationException("JSON is missing the \"scrcmd\" key");
+
+            foreach (JsonProperty prop in scrRoot.EnumerateObject())
+            {
+                ushort code = Convert.ToUInt16(prop.Name.Substring(2), 16);
+                JsonElement entry = prop.Value;
+
+                string name = entry.GetProperty("name").GetString();
+                namesDict[code] = name;
+
+                var arr = entry.GetProperty("parameters");
+                byte[] bytes = arr
+                    .EnumerateArray()
+                    .Select(x => (byte)x.GetInt32())
+                    .ToArray();
+                paramsDict[code] = bytes;
+            }
+
+            Dictionary<ushort, string> soundsDict = ScriptDatabase.soundNames;
+
+            JsonElement soundsRoot;
+            if (!root.TryGetProperty("sounds", out soundsRoot))
+                throw new InvalidOperationException("JSON is missing the \"sounds\" key");
+
+            foreach (JsonProperty prop in soundsRoot.EnumerateObject())
+            {
+                if (ushort.TryParse(prop.Name, out ushort id))
+                {
+                    JsonElement entry = prop.Value;
+                    if (entry.TryGetProperty("name", out JsonElement nameElement))
+                    {
+                        string name = nameElement.GetString();
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            soundsDict[id] = name;
+                        }
+                    }
+                }
+            }
+
+        }
+        finally
+        {
+            doc.Dispose();
+        }
+    }
+
+    public static void LoadParameterTypes(string jsonPath, GameVersions gameVersion)
+    {
+        Dictionary<ushort, List<ScriptParameter.ParameterType>> paramtypesDict;
+        switch (gameVersion)
+        {
+            case GameVersions.Platinum:
+                paramtypesDict = ScriptDatabase.PlatScrCmdParameterTypes;
+                break;
+            case GameVersions.Diamond:
+            case GameVersions.Pearl:
+                paramtypesDict = ScriptDatabase.DPScrCmdParameterTypes;
+                break;
+            case GameVersions.HeartGold:
+            case GameVersions.SoulSilver:
+                paramtypesDict = ScriptDatabase.HGSSScrCmdParameterTypes;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(gameVersion));
+        }
+
+        string text = File.ReadAllText(jsonPath);
+        JsonDocument doc = JsonDocument.Parse(text);
+
+        try
+        {
+            JsonElement root = doc.RootElement;
+            if (!root.TryGetProperty("scrcmd", out JsonElement scrRoot))
+            {
+                throw new InvalidOperationException("JSON is missing the \"scrcmd\" key");
+            }
+
+            foreach (JsonProperty prop in scrRoot.EnumerateObject())
+            {
+                ushort code = Convert.ToUInt16(prop.Name.Substring(2), 16);
+                JsonElement entry = prop.Value;
+
+                if (entry.TryGetProperty("parameter_types", out JsonElement paramTypesElement))
+                {
+                    List<ScriptParameter.ParameterType> paramTypes = new List<ScriptParameter.ParameterType>();
+                    foreach (JsonElement typeElement in paramTypesElement.EnumerateArray())
+                    {
+                        string typeStr = typeElement.GetString();
+                        if (!string.IsNullOrEmpty(typeStr))
+                        {
+                            var paramType = ScriptParameter.ParseTypeString(typeStr);
+                            paramTypes.Add(paramType);
+                        }
+                    }
+
+                    if (paramTypes.Count > 0)
+                    {
+                        paramtypesDict[code] = paramTypes;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            doc.Dispose();
+        }
+    }
+}
 
 namespace DSPRE.Resources {
+    public class MovementInfo
+    {
+        public string Name { get; set; }
+        public string DecompName { get; set; }
+        public string Description { get; set; }
+    }
+
+    public class ScriptCommandInfo
+    {
+        public string Name { get; set; }
+        public string DecompName { get; set; }
+        public byte[] Parameters { get; set; }
+        public List<string> ParameterTypes { get; set; }
+        public string Description { get; set; }
+    }
+
     public static class ScriptDatabase {  
-        public static Dictionary<ushort, string> comparisonOperatorsDict = new Dictionary<ushort, string>() {
-            [0] = "LESS",
-            [1] = "EQUAL",
-            [2] = "GREATER",
-            [3] = "LESS/EQUAL",
-            [4] = "GREATER/EQUAL",
-            [5] = "DIFFERENT",
-        };
         public static Dictionary<ushort, string> comparisonOperatorsGenVappendix = new Dictionary<ushort, string>() {
             /* GEN V ONLY */
             [6] = "OR",
             [7] = "AND",
             [0xFF] = "TRUEUP"
         };
-        public static Dictionary<ushort, string> specialOverworlds = new Dictionary<ushort, string>() {
-            [241] = "Camera",
-            [242] = "Partner",
-            [253] = "Following",
-            [255] = "Player"
-        };
-        public static Dictionary<byte, string> overworldDirections = new Dictionary<byte, string>() {
-            [0] = "Up",
-            [1] = "Down",
-            [2] = "Left",
-            [3] = "Right"
-        };
 
-        public static Dictionary<ushort, string> pokemonNames = new Dictionary<ushort, string>()
+        // will all be populated from json at runtime
+        public static Dictionary<ushort, string> comparisonOperatorsDict = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, string> specialOverworlds = new Dictionary<ushort, string>();
+        public static Dictionary<byte, string> overworldDirections = new Dictionary<byte, string>();
+        public static Dictionary<ushort, string> DPScrCmdNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, byte[]> DPScrCmdParameters = new Dictionary<ushort, byte[]>();
+        public static Dictionary<ushort, List<ScriptParameter.ParameterType>> DPScrCmdParameterTypes = new Dictionary<ushort, List<ScriptParameter.ParameterType>>();
+        public static Dictionary<ushort, string> PlatScrCmdNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, byte[]> PlatScrCmdParameters = new Dictionary<ushort, byte[]>();
+        public static Dictionary<ushort, List<ScriptParameter.ParameterType>> PlatScrCmdParameterTypes = new Dictionary<ushort, List<ScriptParameter.ParameterType>>();
+        public static Dictionary<ushort, string> HGSSScrCmdNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, byte[]> HGSSScrCmdParameters = new Dictionary<ushort, byte[]>();
+        public static Dictionary<ushort, List<ScriptParameter.ParameterType>> HGSSScrCmdParameterTypes = new Dictionary<ushort, List<ScriptParameter.ParameterType>>();
+        public static Dictionary<ushort, string> pokemonNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, string> itemNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, string> moveNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, string> soundNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, string> trainerNames = new Dictionary<ushort, string>();
+        public static Dictionary<ushort, MovementInfo> movementsDict = new Dictionary<ushort, MovementInfo>();
+        public static Dictionary<ushort, string> movementsDictIDName => movementsDict.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Name);
+
+        public static Dictionary<ushort, int> commandsWithRelativeJump = new Dictionary<ushort, int>()
         {
-            // Will be populated at runtime from text archive
-        };
-
-        public static void InitializePokemonNames()
-        {
-            string[] names = RomInfo.GetPokemonNames();
-            pokemonNames = names.Select((name, index) => new { name, index })
-                               .ToDictionary(x => (ushort)x.index, x => x.name);
-        }
-
-        public static Dictionary<ushort, string> itemNames = new Dictionary<ushort, string>()
-        {
-            // Will be populated at runtime from text archive
-        };
-
-        public static void InitializeItemNames()
-        {
-            string[] names = RomInfo.GetItemNames();
-            itemNames = names.Select((name, index) => new { name, index })
-                               .ToDictionary(x => (ushort)x.index, x => x.name);
-        }
-
-        public static Dictionary<ushort, string> moveNames = new Dictionary<ushort, string>()
-        {
-            // Will be populated at runtime from text archive
-        };
-
-        public static void InitializeMoveNames()
-        {
-            string[] names = RomInfo.GetAttackNames();
-            moveNames = names.Select((name, index) => new { name, index })
-                               .ToDictionary(x => (ushort)x.index, x => x.name);
-        }
-
-        public static Dictionary<ushort, int> commandsWithRelativeJump = new Dictionary<ushort, int>() {
             //commandID, ID of parameter With Jump Address
 
             [0x0016] = 0,   //Jump
@@ -88,109 +257,6 @@ namespace DSPRE.Resources {
             0x2,
             0x16,
             0x1B
-        };
-        public static Dictionary<ushort, string> movementsDictIDName = new Dictionary<ushort, string>() {
-            [0x0000] = "LookUp",
-            [0x0001] = "LookDown",
-            [0x0002] = "LookLeft",
-            [0x0003] = "LookRight",
-            [0x0004] = "WalkUpSlow",
-            [0x0005] = "WalkDownSlow",
-            [0x0006] = "WalkLeftSlow",
-            [0x0007] = "WalkRightSlow",
-            [0x0008] = "WalkUp",
-            [0x0009] = "WalkDown",
-            [0x000A] = "WalkLeft",
-            [0x000B] = "WalkRight",
-            [0x000C] = "WalkUpFast",
-            [0x000D] = "WalkDownFast",
-            [0x000E] = "WalkLeftFast",
-            [0x000F] = "WalkRightFast",
-            [0x0010] = "WalkUpVeryFast",
-            [0x0011] = "WalkDownVeryFast",
-            [0x0012] = "WalkLeftVeryFast",
-            [0x0013] = "WalkRightVeryFast",
-            [0x0014] = "RunUp",
-            [0x0015] = "RunDown",
-            [0x0016] = "RunLeft",
-            [0x0017] = "RunRight",
-            [0x0018] = "WalkUpSlowSite",
-            [0x0019] = "WalkDownSlowSite",
-            [0x001A] = "WalkLeftSlowSite",
-            [0x001B] = "WalkRightSlowSite",
-            [0x001C] = "WalkUpSite",
-            [0x001D] = "WalkDownSite",
-            [0x001E] = "WalkLeftSite",
-            [0x001F] = "WalkRightSite",
-            [0x0020] = "WalkUpFastSite",
-            [0x0021] = "WalkDownFastSite",
-            [0x0022] = "WalkLeftFastSite",
-            [0x0023] = "WalkRightFastSite",
-            [0x0024] = "WalkUpVeryFastSite",
-            [0x0025] = "WalkDownVeryFastSite",
-            [0x0026] = "WalkLeftVeryFastSite",
-            [0x0027] = "WalkRightVeryFastSite",
-            [0x0028] = "RunUpSite",
-            [0x0029] = "RunDownSite",
-            [0x002A] = "RunLeftSite",
-            [0x002B] = "RunRightSite",
-            [0x002C] = "JumpUpSlow",
-            [0x002D] = "JumpDownSlow",
-            [0x002E] = "JumpLeftSlow",
-            [0x002F] = "JumpRightSlow",
-            [0x0030] = "JumpUpSite",
-            [0x0031] = "JumpDownSite",
-            [0x0032] = "JumpLeftSite",
-            [0x0033] = "JumpRightSite",
-            [0x0034] = "JumpUp",
-            [0x0035] = "JumpDown",
-            [0x0036] = "JumpLeft",
-            [0x0037] = "JumpRight",
-            [0x0038] = "JumpUp2",
-            [0x0039] = "JumpDown2",
-            [0x003A] = "JumpLeft2",
-            [0x003B] = "JumpRight2",
-            [0x003C] = "Freeze1",
-            [0x003D] = "Freeze2",
-            [0x003E] = "Freeze4",
-            [0x003F] = "Freeze8",
-            [0x0040] = "Freeze15",
-            [0x0041] = "Freeze16",
-            [0x0042] = "Freeze32",
-            [0x0043] = "TeleportUp",
-            [0x0044] = "TeleportDown",
-            [0x0045] = "DisappearTrue",
-            [0x0046] = "DisappearFalse",
-            [0x0047] = "LockDir",
-            [0x0048] = "ReleaseDir",
-            [0x0049] = "StopAnimation",
-            [0x004A] = "ResumeAnimation",
-            [0x004B] = "Exclamation",
-            [0x004C] = "WaitWalkUpSlow",
-            [0x004D] = "WaitWalkDownSlow",
-            [0x004E] = "WaitWalkLeftSlow",//Seems to make the player run in HGSS?
-            [0x004F] = "WaitWalkRightSlow",
-            [0x0050] = "WaitWalkUp",
-            [0x0051] = "WaitWalkDown",
-            [0x0052] = "WaitWalkLeft",
-            [0x0053] = "WaitWalkRight",
-            [0x0054] = "WaitMoveUp",
-            [0x0055] = "WaitMoveDown",
-            [0x0056] = "WaitMoveLeft",
-            [0x0057] = "WaitMoveRight",
-            [0x0058] = "WaitWalkBackUp",
-            [0x0059] = "WaitWalkBackDown",
-            [0x005A] = "WaitWalkBackLeft",
-            [0x005B] = "WaitWalkBackRight",
-            [0x005C] = "WaitJumpLeft1",
-            [0x005D] = "WaitJumpRight1",
-            [0x005E] = "WaitJumpLeft2",
-            [0x005F] = "WaitJumpRight2",
-            [0x0064] = "WaitMoveSite",
-            [0x0065] = "WaitJumpSite",
-            [0x0067] = "WaitDoubleExclamation",
-            [0x0068] = "WaitMoveForever",
-            [0x00FE] = "End"
         };
 
         public static HashSet<ushort?> movementEndCodes = new HashSet<ushort?>() {
@@ -3164,5 +3230,47 @@ namespace DSPRE.Resources {
             [0x0353] = new byte[] { 1 },
             [0x0354] = new byte[] { 1, 1 }
         };
+        public static void InitializePokemonNames()
+        {
+            string[] names = GetPokemonNames();
+            pokemonNames = names.Select((name, index) => new { name, index })
+                             .ToDictionary(
+                                 x => (ushort)x.index, 
+                                 x => "SPECIES_" + x.name.ToUpper().Replace(' ', '_')
+                             );
+        }
+        public static void InitializeItemNames()
+        {
+            string[] names = GetItemNames();
+            itemNames = names.Select((name, index) => new { name, index })
+                             .ToDictionary(
+                                 x => (ushort)x.index,
+                                 x => "ITEM_" + x.name.ToUpper().Replace(' ', '_').Replace('É', 'E')
+                             );
+        }
+        public static void InitializeMoveNames()
+        {
+            string[] names = GetAttackNames();
+            moveNames = names.Select((name, index) => new { name, index })
+                             .ToDictionary(
+                                 x => (ushort)x.index,
+                                 x => "MOVE_" + x.name.ToUpper().Replace(' ', '_')
+                             );
+        }
+        public static void InitializeTrainerNames()
+        {
+            string[] names = GetSimpleTrainerNames();
+
+            trainerNames = Enumerable.Range(0, names.Length)
+                .ToDictionary(
+                    index => (ushort)index,
+                    index => index == 0
+                        ? "TRAINER_NONE"
+                        : $"TRAINER_{names[index]}_{index:D3}"
+                            .ToUpper()
+                            .Replace(' ', '_')
+                            .Replace("&", "AND")
+            );
+        }
     }
 }

@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
-using DSPRE.Resources;
+﻿using DSPRE.Resources;
 using DSPRE.ROMFiles;
 using ScintillaNET;
 using ScintillaNET.Utils;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
 namespace DSPRE.Editors
 {
     public partial class ScriptEditor : UserControl
@@ -27,6 +29,7 @@ namespace DSPRE.Editors
         private bool actionsDirty = false;
         private string cmdKeyWords = "";
         private string secondaryKeyWords = "";
+        private string altCaseKeywords = "";
         private ScriptFile currentScriptFile;
         MainProgram _parent;
         /// <summary>
@@ -90,6 +93,10 @@ namespace DSPRE.Editors
             if (scriptEditorIsReady && !force) { return; }
             scriptEditorIsReady = true;
             this._parent = parent;
+            ScriptDatabase.InitializePokemonNames();
+            ScriptDatabase.InitializeItemNames();
+            ScriptDatabase.InitializeMoveNames();
+            ScriptDatabase.InitializeTrainerNames();
             SetupScriptEditorTextAreas();
             /* Extract essential NARCs sub-archives*/
             Helpers.statusLabelMessage("Setting up Script Editor...");
@@ -111,20 +118,24 @@ namespace DSPRE.Editors
         {
             //PREPARE SCRIPT EDITOR KEYWORDS
             cmdKeyWords = String.Join(" ", RomInfo.ScriptCommandNamesDict.Values) +
-                          " " + String.Join(" ", ScriptDatabase.movementsDictIDName.Values);
-            cmdKeyWords += " " + cmdKeyWords.ToUpper() + " " + cmdKeyWords.ToLower();
+                            " " + String.Join(" ", ScriptDatabase.movementsDict.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Name).Values);
             secondaryKeyWords = String.Join(" ", RomInfo.ScriptComparisonOperatorsDict.Values) +
                                 " " + String.Join(" ", ScriptDatabase.specialOverworlds.Values) +
                                 " " + String.Join(" ", ScriptDatabase.overworldDirections.Values) +
                                 " " + String.Join(" ", ScriptDatabase.pokemonNames.Values) +
                                 " " + String.Join(" ", ScriptDatabase.itemNames.Values) +
                                 " " + String.Join(" ", ScriptDatabase.moveNames.Values) +
+                                " " + String.Join(" ", ScriptDatabase.soundNames.Values) +
+                                " " + String.Join(" ", ScriptDatabase.trainerNames.Values) +
                                 " " + ScriptFile.ContainerTypes.Script.ToString() +
                                 " " + ScriptFile.ContainerTypes.Function.ToString() +
                                 " " + ScriptFile.ContainerTypes.Action.ToString() +
                                 " " + Event.EventType.Overworld +
                                 " " + Overworld.MovementCodeKW;
-            secondaryKeyWords += " " + secondaryKeyWords.ToUpper() + " " + secondaryKeyWords.ToLower();
+
+            altCaseKeywords += " " + cmdKeyWords.ToUpper() + " " + cmdKeyWords.ToLower();
+            altCaseKeywords += " " + secondaryKeyWords.ToUpper() + " " + secondaryKeyWords.ToLower();
+
             // CREATE CONTROLS
             ScriptTextArea = new Scintilla();
             scriptSearchManager = new SearchManager(EditorPanels.MainProgram, ScriptTextArea, panelFindScriptTextBox, PanelSearchScripts);
@@ -148,6 +159,10 @@ namespace DSPRE.Editors
             ScriptTextArea.TextChanged += (OnTextChangedScript);
             FunctionTextArea.TextChanged += (OnTextChangedFunction);
             ActionTextArea.TextChanged += (OnTextChangedAction);
+
+            ScriptTextArea.CharAdded += OnCharAdded;
+            FunctionTextArea.CharAdded += OnCharAdded;
+            ActionTextArea.CharAdded += OnCharAdded;
 
             // INITIAL VIEW CONFIG
             InitialViewConfig(ScriptTextArea);
@@ -210,6 +225,13 @@ namespace DSPRE.Editors
             textArea.CaretForeColor = Color.White;
             textArea.SetSelectionBackColor(true, Color.FromArgb(0x114D9C));
             textArea.WrapIndentMode = WrapIndentMode.Same;
+
+            // Auto Completion
+            textArea.AutoCMaxHeight = 20;
+            textArea.AutoCIgnoreCase = true;
+            textArea.AutoCOrder = Order.Custom;
+            textArea.AutoCCancelAtStart = false;
+            textArea.AutoCAutoHide = false;
         }
 
         private void InitSyntaxColoring(Scintilla textArea)
@@ -236,6 +258,7 @@ namespace DSPRE.Editors
 
             textArea.SetKeywords(0, cmdKeyWords);
             textArea.SetKeywords(1, secondaryKeyWords);
+            textArea.SetKeywords(2, altCaseKeywords);
         }
 
         private void InitNumberMargin(Scintilla textArea, EventHandler<MarginClickEventArgs> textArea_MarginClick)
@@ -304,12 +327,26 @@ namespace DSPRE.Editors
             HotKeyManager.AddHotKey(scintillaTb, () => ZoomOut(scintillaTb), Keys.OemMinus, true);
             HotKeyManager.AddHotKey(scintillaTb, () => ZoomDefault(scintillaTb), Keys.D0, true);
             HotKeyManager.AddHotKey(scintillaTb, sm.CloseSearch, Keys.Escape);
+            HotKeyManager.AddHotKey(scintillaTb, () => ToggleAutoComplete(scintillaTb), Keys.Space, true);
+            HotKeyManager.AddHotKey(scintillaTb, () => SaveScriptFile(scintillaTb, false), Keys.S, true);
+
             // remove conflicting hotkeys from scintilla
             scintillaTb.ClearCmdKey(Keys.Control | Keys.F);
-            scintillaTb.ClearCmdKey(Keys.Control | Keys.R);
+            scintillaTb.ClearCmdKey(Keys.Control | Keys.Space);
             scintillaTb.ClearCmdKey(Keys.Control | Keys.H);
             scintillaTb.ClearCmdKey(Keys.Control | Keys.L);
             scintillaTb.ClearCmdKey(Keys.Control | Keys.U);
+            scintillaTb.ClearCmdKey(Keys.Control | Keys.S);
+
+            // remove ctrl + space
+            scintillaTb.KeyDown += (sender, e) =>
+            {
+                if (e.Control && e.KeyCode == Keys.Space)
+                {
+                    e.SuppressKeyPress = true; // Prevents the space from being inserted
+                }
+            };
+
         }
         private void Uppercase(Scintilla textArea)
         {
@@ -343,6 +380,63 @@ namespace DSPRE.Editors
         {
             textArea.Zoom = 0;
         }
+
+        private void ToggleAutoComplete(Scintilla textArea)
+        {
+            if (textArea.AutoCActive)
+            {
+                textArea.AutoCCancel();
+                return;
+            }
+            CompleteCurrent(textArea);
+        }
+
+        private void CompleteCurrent(Scintilla textArea)
+        {
+            int currentPos = textArea.CurrentPosition;
+            int wordStartPos = textArea.WordStartPosition(currentPos, true);
+
+            int wordLen = Math.Max(currentPos - wordStartPos, 0);
+
+            string currentWord = textArea.GetTextRange(wordStartPos, wordLen);
+
+            textArea.AutoCShow(wordLen, cmdKeyWords + secondaryKeyWords);
+        }
+
+        private void SaveScriptFile(Scintilla textArea, bool showMessage)
+        {
+            /* Create new ScriptFile object using the values in the script editor */
+            int fileID = currentScriptFile.fileID;
+
+            ScriptTextArea.ReadOnly = true;
+            FunctionTextArea.ReadOnly = true;
+            ActionTextArea.ReadOnly = true;
+
+            ScriptFile userEdited = new ScriptFile(
+              scriptLines: ScriptTextArea.Lines.ToStringsList(trim: true),
+              functionLines: FunctionTextArea.Lines.ToStringsList(trim: true),
+              actionLines: ActionTextArea.Lines.ToStringsList(trim: true),
+              fileID
+            );
+
+            if (userEdited.hasNoScripts)
+            {
+                MessageBox.Show("This " + nameof(ScriptFile) + " couldn't be saved. A minimum of one script is required.", "Can't save", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            //check if ScriptFile instance was created successfully
+            if (userEdited.SaveToFileDefaultDir(fileID, showMessage))
+            {
+                currentScriptFile = userEdited;
+                ScriptEditorSetClean();
+            }
+
+            ScriptTextArea.ReadOnly = false;
+            FunctionTextArea.ReadOnly = false;
+            ActionTextArea.ReadOnly = false;
+        }
+
         private void ScriptEditorSetClean()
         {
             Helpers.DisableHandlers();
@@ -358,13 +452,25 @@ namespace DSPRE.Editors
         private void OnTextChangedScript(object sender, EventArgs e)
         {
             ScriptTextArea.Margins[NUMBER_MARGIN].Width = ScriptTextArea.Lines.Count.ToString().Length * 13;
+
+            if (scriptsDirty)
+            {
+                return;
+            }
+
             scriptsDirty = true;
-            scriptsTabPage.Text = ScriptFile.ContainerTypes.Script.ToString() + "s" + "*";
+            scriptsTabPage.Text = ScriptFile.ContainerTypes.Script.ToString() + "s" + "*";           
         }
 
         private void OnTextChangedFunction(object sender, EventArgs e)
         {
             FunctionTextArea.Margins[NUMBER_MARGIN].Width = FunctionTextArea.Lines.Count.ToString().Length * 13;
+
+            if (functionsDirty)
+            {
+                return;
+            }
+
             functionsDirty = true;
             functionsTabPage.Text = ScriptFile.ContainerTypes.Function.ToString() + "s" + "*";
         }
@@ -372,8 +478,31 @@ namespace DSPRE.Editors
         private void OnTextChangedAction(object sender, EventArgs e)
         {
             ActionTextArea.Margins[NUMBER_MARGIN].Width = ActionTextArea.Lines.Count.ToString().Length * 13;
+
+            if (actionsDirty)
+            {
+                return;
+            }
+
             actionsDirty = true;
             actionsTabPage.Text = ScriptFile.ContainerTypes.Action.ToString() + "s" + "*";
+        }
+
+        private void OnCharAdded(object sender, EventArgs e)
+        {
+            if (!(sender is Scintilla textArea))
+            {
+                return;
+            }
+
+            if (!textArea.AutoCActive)
+            {
+                // If the AutoComplete is active, we don't want to do anything else
+                return;
+            }
+
+            //CompleteCurrent(textArea);
+
         }
 
         private void ScriptTextArea_MarginClick(object sender, MarginClickEventArgs e)
@@ -430,7 +559,7 @@ namespace DSPRE.Editors
                     scriptEditorNumberFormatDecimal.Checked = true;
                     break;
             }
-            Console.WriteLine("changed style to " + SettingsManager.Settings.scriptEditorFormatPreference);
+            AppLogger.Debug("changed style to " + SettingsManager.Settings.scriptEditorFormatPreference);
             Helpers.EnableHandlers();
         }
         private void UpdateScriptNumberFormat(NumberStyles numberStyle)
@@ -459,7 +588,7 @@ namespace DSPRE.Editors
         }
         private bool DisplayScript()
         {
-            Console.WriteLine("Script Reload has been requested");
+            AppLogger.Debug("Script Reload has been requested");
             /* clear controls */
             if (Helpers.HandlersDisabled || selectScriptFileComboBox.SelectedItem == null)
             {
@@ -683,53 +812,134 @@ namespace DSPRE.Editors
 
         private void saveScriptFileButton_Click(object sender, EventArgs e)
         {
-            /* Create new ScriptFile object using the values in the script editor */
-            int fileID = currentScriptFile.fileID;
-
-            ScriptFile userEdited = new ScriptFile(
-              scriptLines: ScriptTextArea.Lines.ToStringsList(trim: true),
-              functionLines: FunctionTextArea.Lines.ToStringsList(trim: true),
-              actionLines: ActionTextArea.Lines.ToStringsList(trim: true),
-              fileID
-            );
-
-            if (userEdited.hasNoScripts)
-            {
-                MessageBox.Show("This " + nameof(ScriptFile) + " couldn't be saved. A minimum of one script is required.", "Can't save", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            //check if ScriptFile instance was created successfully
-            if (userEdited.SaveToFileDefaultDir(fileID))
-            {
-                currentScriptFile = userEdited;
-                ScriptEditorSetClean();
-            }
+            SaveScriptFile(null, true);
         }
         private void exportScriptFileButton_Click(object sender, EventArgs e)
         {
-            currentScriptFile.SaveToFileExplorePath(currentScriptFile.ToString(), blindmode: true);
+            string baseFileName = currentScriptFile.ToString();
+
+            using (SaveFileDialog sf = new SaveFileDialog())
+            {
+                sf.Filter = "Script File (*.script)|*.script";
+                sf.FileName = baseFileName + ".script";
+                if (sf.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        // Build the file content with headers and sections
+                        StringBuilder content = new StringBuilder();
+
+                        // Add file header
+                        content.AppendLine("/*");
+                        content.AppendLine(" * DSPRE Script File");
+
+                        string romFileName = Path.GetFileNameWithoutExtension(RomInfo.projectName);
+                        string romFileNameClean = romFileName.EndsWith("_DSPRE_contents")
+                            ? romFileName.Substring(0, romFileName.Length - "_DSPRE_contents".Length)
+                            : romFileName;
+                        content.AppendLine(" * Rom ID: " + romFileNameClean);
+                        content.AppendLine(" * Game: " + RomInfo.gameFamily);
+                        content.AppendLine($" * File: {baseFileName}");
+                        content.AppendLine($" * Generated: {DateTime.Now}");
+                        content.AppendLine(" */");
+                        content.AppendLine();
+
+                        // Add Scripts section
+                        content.AppendLine("//===== SCRIPTS =====//");
+                        content.AppendLine(ScriptTextArea.Text.Trim());
+                        content.AppendLine();
+
+                        // Add Functions section
+                        content.AppendLine("//===== FUNCTIONS =====//");
+                        content.AppendLine(FunctionTextArea.Text.Trim());
+                        content.AppendLine();
+
+                        // Add Actions section
+                        content.AppendLine("//===== ACTIONS =====//");
+                        content.AppendLine(ActionTextArea.Text.Trim());
+
+                        File.WriteAllText(sf.FileName, content.ToString());
+                        MessageBox.Show("Script file exported successfully!", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error exporting script file: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
+
         private void importScriptFileButton_Click(object sender, EventArgs e)
         {
-            /* Prompt user to select .scr or .bin file */
-            OpenFileDialog of = new OpenFileDialog
+            using (OpenFileDialog of = new OpenFileDialog())
             {
-                Filter = "Script File (*.scr, *.bin)|*.scr;*.bin"
-            };
-            if (of.ShowDialog(this) != DialogResult.OK)
-            {
-                return;
+                of.Filter = "Script Files (*.script)|*.script|All Files (*.*)|*.*";
+
+                if (of.ShowDialog(this) == DialogResult.OK)
+                {
+                    try
+                    {
+                        string content = File.ReadAllText(of.FileName);
+
+                        // Split content into sections
+                        const string SCRIPTS_HEADER = "//===== SCRIPTS =====//";
+                        const string FUNCTIONS_HEADER = "//===== FUNCTIONS =====//";
+                        const string ACTIONS_HEADER = "//===== ACTIONS =====//";
+
+                        int scriptsStart = content.IndexOf(SCRIPTS_HEADER);
+                        int functionsStart = content.IndexOf(FUNCTIONS_HEADER);
+                        int actionsStart = content.IndexOf(ACTIONS_HEADER);
+
+                        if (scriptsStart == -1 || functionsStart == -1 || actionsStart == -1)
+                        {
+                            throw new FormatException("Invalid script file format. Missing required section headers.");
+                        }
+
+                        // Extract each section's content
+                        string scripts = content.Substring(
+                            scriptsStart + SCRIPTS_HEADER.Length,
+                            functionsStart - (scriptsStart + SCRIPTS_HEADER.Length)
+                        ).Trim();
+
+                        string functions = content.Substring(
+                            functionsStart + FUNCTIONS_HEADER.Length,
+                            actionsStart - (functionsStart + FUNCTIONS_HEADER.Length)
+                        ).Trim();
+
+                        string actions = content.Substring(
+                            actionsStart + ACTIONS_HEADER.Length
+                        ).Trim();
+
+                        // Update text areas
+                        ScriptTextArea.Text = scripts;
+                        FunctionTextArea.Text = functions;
+                        ActionTextArea.Text = actions;
+
+                        MessageBox.Show("Script file imported successfully!", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error importing script file: {ex.Message}", "Import Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
-            /* Update scriptFile object in memory */
-            int i = selectScriptFileComboBox.SelectedIndex;
-            string path = Filesystem.GetScriptPath(i);
-            File.Copy(of.FileName, path, true);
-            populate_selectScriptFileComboBox(i);
-            /* Refresh controls */
-            selectScriptFileComboBox_SelectedIndexChanged(null, null);
-            /* Display success message */
-            MessageBox.Show("Scripts imported successfully!", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ImportMatchingFiles(string directory, string baseFileName)
+        {
+            // Try to import matching function file
+            string funcFile = Path.Combine(directory, baseFileName + ".func");
+            if (File.Exists(funcFile))
+            {
+                FunctionTextArea.Text = File.ReadAllText(funcFile);
+            }
+
+            // Try to import matching action file
+            string actionFile = Path.Combine(directory, baseFileName + ".action");
+            if (File.Exists(actionFile))
+            {
+                ActionTextArea.Text = File.ReadAllText(actionFile);
+            }
         }
         private void viewLevelScriptButton_Click(object sender, EventArgs e)
         {
@@ -920,7 +1130,7 @@ namespace DSPRE.Editors
                 });
                 int i = selectScriptFileComboBox.SelectedIndex;
                 ScriptFile scriptFile = new ScriptFile(i);
-                Console.WriteLine("Attempting to load script " + scriptFile.fileID);
+                AppLogger.Debug("Attempting to load script " + scriptFile.fileID);
                 scriptsToSearch.Add(scriptFile);
                 this.UIThread(() => {
                     searchProgressBar.IncrementNoAnimation();
@@ -934,7 +1144,7 @@ namespace DSPRE.Editors
                 for (int i = 0; i < selectScriptFileComboBox.Items.Count; i++)
                 {
                     ScriptFile scriptFile = new ScriptFile(i);
-                    Console.WriteLine("Attempting to load script " + scriptFile.fileID);
+                    AppLogger.Debug("Attempting to load script " + scriptFile.fileID);
                     scriptsToSearch.Add(scriptFile);
                     this.UIThread(() => {
                         searchProgressBar.IncrementNoAnimation();

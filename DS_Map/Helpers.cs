@@ -1,10 +1,10 @@
 ﻿using DSPRE.ROMFiles;
 using Ekona.Images;
 using Images;
+using LibGit2Sharp;
 using LibNDSFormats.NSBMD;
 using LibNDSFormats.NSBTX;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using NSMBe4.DSFileSystem;
 using ScintillaNET;
 using ScintillaNET.Utils;
 using System;
@@ -17,7 +17,6 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using Tao.OpenGl;
-using Tao.Platform.Windows;
 using Velopack;
 using Velopack.Sources;
 using static DSPRE.RomInfo;
@@ -66,6 +65,128 @@ namespace DSPRE {
                 {
                     AppLogger.Info("User declined to update the application.");
                 }
+            }
+        }
+
+        public static void CheckForDatabaseUpdates(bool silent = true)
+        {
+            AppLogger.Info("Checking for script database updates...");
+            string pathToDbRepo = Program.DatabasePath;
+
+            try
+            {
+                if (!Repository.IsValid(pathToDbRepo))
+                {
+                    Repository.Init(pathToDbRepo);
+                    using (var repo = new Repository(pathToDbRepo))
+                    {
+                        Remote remote = repo.Network.Remotes.Add("origin", "https://github.com/DS-Pokemon-Rom-Editor/scrcmd-database.git");
+                        Commands.Fetch(repo, remote.Name, new string[] { "refs/heads/main:refs/heads/main" }, null, null);
+
+                        // Check if main branch exists
+                        Branch main = repo.Branches["main"] ?? repo.CreateBranch("main", repo.Branches["refs/heads/main"].Tip);
+                        repo.Branches.Update(main, b => b.TrackedBranch = "refs/remotes/origin/main");
+                        Commands.Checkout(repo, main);
+                    }
+                }
+
+                using (var repo = new Repository(pathToDbRepo))
+                {
+                    var remote = repo.Network.Remotes["origin"];
+                    try
+                    {
+                        // Reset any changes
+                        if (repo.Head.Tip != null)
+                        {
+                            repo.Reset(ResetMode.Hard);
+                        }
+
+                        // Clean up untracked files
+                        foreach (var item in repo.RetrieveStatus().Untracked)
+                        {
+                            string fullPath = Path.Combine(pathToDbRepo, item.FilePath);
+                            if (File.Exists(fullPath))
+                                File.Delete(fullPath);
+                            else if (Directory.Exists(fullPath))
+                                Directory.Delete(fullPath, true);
+                        }
+
+                        Commands.Fetch(repo, remote.Name, remote.FetchRefSpecs.Select(x => x.Specification), null, null);
+
+                        // Get the remote main branch and force checkout
+                        var remoteBranch = repo.Branches["origin/main"];
+                        var options = new CheckoutOptions { CheckoutModifiers = CheckoutModifiers.Force };
+                        Commands.Checkout(repo, repo.Branches["main"], options);
+                        repo.Reset(ResetMode.Hard, remoteBranch.Tip);
+
+                        AppLogger.Info("Script databases updated successfully");
+                        if (!silent)
+                        {
+                            MessageBox.Show("Script database updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLogger.Warn($"Could not fetch updates: {ex.Message}");
+                        if (!silent)
+                        {
+                            MessageBox.Show("Could not fetch database updates. Using local database files.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Warn($"Could not access git repository: {ex.Message}");
+                if (!silent)
+                {
+                    MessageBox.Show("Could not access database repository. Using local database files.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        public static void InitializeScriptDatabase(string romFileName, GameFamilies gameFamily, GameVersions gameVersion)
+        {
+            string baseFileName = Path.GetFileNameWithoutExtension(romFileName);
+            string romFileNameClean = baseFileName.EndsWith("_DSPRE_contents")
+                ? baseFileName.Substring(0, baseFileName.Length - "_DSPRE_contents".Length)
+                : baseFileName;
+
+            if (SettingsManager.Settings.automaticallyUpdateDBs)
+            {
+                CheckForDatabaseUpdates();
+            }
+
+            string editedDatabasesDir = Path.Combine(Program.DatabasePath, "edited_databases");
+            Directory.CreateDirectory(editedDatabasesDir);
+
+            string targetJsonPath = Path.Combine(editedDatabasesDir, $"{romFileNameClean}_scrcmd_database.json");
+            string databaseJsonPath;
+
+            switch (gameFamily) {
+                case GameFamilies.DP:
+                    databaseJsonPath = Path.Combine(Program.DatabasePath, "diamond_pearl_scrcmd_database.json");
+                    break;
+                case GameFamilies.HGSS:
+                    databaseJsonPath = Path.Combine(Program.DatabasePath, "hgss_scrcmd_database.json");
+                    break;
+                case GameFamilies.Plat:
+                    databaseJsonPath = Path.Combine(Program.DatabasePath, "platinum_scrcmd_database.json");
+                    break;
+                default:
+                    throw new Exception("Unknown game family");
+            }
+
+            if (!File.Exists(targetJsonPath)) {
+                File.Copy(databaseJsonPath, targetJsonPath);
+            }
+
+            try {
+                ScriptDatabaseJsonLoader.InitializeFromJson(targetJsonPath, gameVersion);
+                ScriptDatabaseJsonLoader.LoadParameterTypes(targetJsonPath, gameVersion);
+            } catch (Exception ex) {
+                AppLogger.Error($"Failed to load script database: {ex.Message}");
+                MessageBox.Show("Failed to load script database. Script editing features may be limited.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -204,56 +325,62 @@ namespace DSPRE {
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
         }
 
-        public static void RenderMap(ref MapFile mapFile, int width, int height, float ang, float dist, float elev, float perspective, bool mapTexturesON = true, bool buildingTexturesON = true) {
+        public static void RenderMap(ref NSBMDGlRenderer mapRenderer, ref NSBMDGlRenderer buildingsRenderer, ref MapFile mapFile, float ang, float dist, float elev, float perspective, int width, int height, bool mapTexturesON = true, bool buildingTexturesON = true)
+        {
             #region Useless variables that the rendering API still needs
-
             MKDS_Course_Editor.NSBTA.NSBTA.NSBTA_File ani = new MKDS_Course_Editor.NSBTA.NSBTA.NSBTA_File();
             MKDS_Course_Editor.NSBTP.NSBTP.NSBTP_File tp = new MKDS_Course_Editor.NSBTP.NSBTP.NSBTP_File();
             MKDS_Course_Editor.NSBCA.NSBCA.NSBCA_File ca = new MKDS_Course_Editor.NSBCA.NSBCA.NSBCA_File();
             int[] aniframeS = new int[0];
-
             #endregion
+
+            /* Invalidate drawing surfaces */
+            EditorPanels.mapEditor.mapOpenGlControl.Invalidate();
+            EditorPanels.eventEditor.eventOpenGlControl.Invalidate();
 
             /* Adjust rendering settings */
             SetupRenderer(ang, dist, elev, perspective, width, height);
 
             /* Render the map model */
-            NSBMD model = mapFile.mapModel;
-            mapRenderer.Model = model.models[0];
-
-            // int scale = 64;
-            float scale = 0.015625f;
-            Gl.glScalef(mapRenderer.Model.modelScale * scale, mapRenderer.Model.modelScale * scale, mapRenderer.Model.modelScale * scale);
+            mapRenderer.Model = mapFile.mapModel.models[0];
+            Gl.glScalef(mapFile.mapModel.models[0].modelScale / 64, mapFile.mapModel.models[0].modelScale / 64, mapFile.mapModel.models[0].modelScale / 64);
 
             /* Determine if map textures must be rendered */
-            if (mapTexturesON) {
-                Gl.glEnable(Gl.GL_TEXTURE_2D);
-            } else {
+            if (!mapTexturesON)
+            {
                 Gl.glDisable(Gl.GL_TEXTURE_2D);
             }
-
-            // Render map model
-            mapRenderer.RenderModel("", ani, aniframeS, aniframeS, aniframeS, aniframeS, aniframeS, ca, false, -1, 0.0f, 0.0f, dist, elev, ang, true, tp, model);
-
-            if (hideBuildings) {
-                return;
-            }
-
-            if (buildingTexturesON) {
+            else
+            {
                 Gl.glEnable(Gl.GL_TEXTURE_2D);
-            } else {
-                Gl.glDisable(Gl.GL_TEXTURE_2D);
             }
 
-            for (int i = 0; i < mapFile.buildings.Count; i++) {
-                Building building = mapFile.buildings[i];
-                model = building.NSBMDFile;
-                if (model is null) {
-                    Console.WriteLine("Null building can't be rendered");
-                } else {
-                    mapRenderer.Model = model.models[0];
-                    ScaleTranslateRotateBuilding(building);
-                    mapRenderer.RenderModel("", ani, aniframeS, aniframeS, aniframeS, aniframeS, aniframeS, ca, false, -1, 0.0f, 0.0f, dist, elev, ang, true, tp, model);
+            mapRenderer.RenderModel("", ani, aniframeS, aniframeS, aniframeS, aniframeS, aniframeS, ca, false, -1, 0.0f, 0.0f, dist, elev, ang, true, tp, mapFile.mapModel); // Render map model
+
+            if (!hideBuildings)
+            {
+                if (buildingTexturesON)
+                {
+                    Gl.glEnable(Gl.GL_TEXTURE_2D);
+                }
+                else
+                {
+                    Gl.glDisable(Gl.GL_TEXTURE_2D);
+                }
+
+                for (int i = 0; i < mapFile.buildings.Count; i++)
+                {
+                    NSBMD file = mapFile.buildings[i].NSBMDFile;
+                    if (file is null)
+                    {
+                        AppLogger.Warn("Null building can't be rendered");
+                    }
+                    else
+                    {
+                        buildingsRenderer.Model = file.models[0];
+                        ScaleTranslateRotateBuilding(mapFile.buildings[i]);
+                        buildingsRenderer.RenderModel("", ani, aniframeS, aniframeS, aniframeS, aniframeS, aniframeS, ca, false, -1, 0.0f, 0.0f, dist, elev, ang, true, tp, file);
+                    }
                 }
             }
         }
@@ -452,7 +579,7 @@ namespace DSPRE {
         extern static bool DestroyIcon(IntPtr handle);
 
 
-        public static void PopOutEditor<T>(T control, string title, Image icon, Action<T> onClose = null) where T : Control
+        public static void PopOutEditorHandler<T>(T control, string title, Image icon, Action<T> onClose = null) where T : Control
         {
             var originalParent = control.Parent;
             var originalIndex = originalParent?.Controls.IndexOf(control) ?? -1;
@@ -504,6 +631,25 @@ namespace DSPRE {
             form.Show();
         }
 
+
+        public static void PopOutEditor(Control control, string editorName, Label label, Button button, Image icon)
+        {
+            if (control == null)
+            {
+                MessageBox.Show("The editor control is not initialized.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            label.Visible = true; // Show Editor popped-out label
+            button.Enabled = false; // Disable popout button
+
+            Helpers.PopOutEditorHandler(control, editorName, icon, onClose =>
+            {
+                label.Visible = false; // Hide Editor popped-out label
+                button.Enabled = true; // Enable popout button
+            });
+        }
+
         public static void ExclusiveCBInvert(CheckBox cb)
         {
             if (Helpers.HandlersDisabled)
@@ -549,7 +695,6 @@ namespace DSPRE {
                 const byte toRead = 16;
                 foreach (FileInfo f in files)
                 {
-                    Console.WriteLine(f.Name);
 
                     string fileNameOnly = Path.GetFileNameWithoutExtension(f.FullName);
                     string dirNameOnly = Path.GetDirectoryName(f.FullName);
@@ -748,7 +893,7 @@ namespace DSPRE {
                 }
             }
 
-            Console.WriteLine("CSV file exported successfully.");
+            AppLogger.Info("CSV file exported successfully.");
         }
 
     }

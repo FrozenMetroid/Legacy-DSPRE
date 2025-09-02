@@ -148,6 +148,12 @@
     <Compile Include="Editors\EncountersEditor.Designer.cs">
       <DependentUpon>EncountersEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Editors\EventEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\EventEditor.Designer.cs">
+      <DependentUpon>EventEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editors\HeadbuttEncounterEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -159,6 +165,18 @@
     </Compile>
     <Compile Include="Editors\HeadbuttEncounterEditorTab.Designer.cs">
       <DependentUpon>HeadbuttEncounterEditorTab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\HeaderEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\HeaderEditor.Designer.cs">
+      <DependentUpon>HeaderEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\MapEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\MapEditor.Designer.cs">
+      <DependentUpon>MapEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\Utils\IndexedBitmapHandler.cs" />
     <Compile Include="Editors\ItemEditor.cs">
@@ -175,6 +193,12 @@
     </Compile>
     <Compile Include="Editors\LoadingForm.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Editors\MatrixEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Editors\MatrixEditor.Designer.cs">
+      <DependentUpon>MatrixEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\MoveDataEditor.cs">
       <SubType>Form</SubType>
@@ -312,6 +336,12 @@
     </Compile>
     <Compile Include="ReopenProjectConfirmation.Designer.cs">
       <DependentUpon>ReopenProjectConfirmation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Resources\CustomScrcmdManager.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Resources\CustomScrcmdManager.Designer.cs">
+      <DependentUpon>CustomScrcmdManager.cs</DependentUpon>
     </Compile>
     <Compile Include="Resources\ROMToolboxDB\ToolboxDB.cs" />
     <Compile Include="Resources\ScriptDatabase.cs" />
@@ -503,17 +533,29 @@
     <EmbeddedResource Include="Editors\EncountersEditor.resx">
       <DependentUpon>EncountersEditor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editors\EventEditor.resx">
+      <DependentUpon>EventEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editors\HeadbuttEncounterEditor.resx">
       <DependentUpon>HeadbuttEncounterEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\HeadbuttEncounterEditorTab.resx">
       <DependentUpon>HeadbuttEncounterEditorTab.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Editors\HeaderEditor.resx">
+      <DependentUpon>HeaderEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Editors\ItemEditor.resx">
       <DependentUpon>ItemEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\LevelScriptEditor.resx">
       <DependentUpon>LevelScriptEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\MapEditor.resx">
+      <DependentUpon>MapEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Editors\MatrixEditor.resx">
+      <DependentUpon>MatrixEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Editors\MoveDataEditor.resx">
       <DependentUpon>MoveDataEditor.cs</DependentUpon>
@@ -572,6 +614,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ReopenProjectConfirmation.resx">
       <DependentUpon>ReopenProjectConfirmation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\CustomScrcmdManager.resx">
+      <DependentUpon>CustomScrcmdManager.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\ROMToolboxDB\BDHCAMPatchDB.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -827,10 +872,18 @@
     <None Include="Resources\Graphics\Program Icons\sortDescending.png" />
     <None Include="Resources\RenameIcon.png" />
     <None Include="Resources\weather_editor.bmp" />
+    <None Include="Resources\scriptDBIconExport.png" />
+    <None Include="Resources\scriptDBIconImport.png" />
     <Content Include="Tools\apicula.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Tools\blz.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\charmap.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Tools\msgenc.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Tools\ndstool.exe">
@@ -881,6 +934,12 @@
     </PackageReference>
     <PackageReference Include="Velopack">
       <Version>0.0.1298</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>9.0.7</Version>
+    </PackageReference>
+    <PackageReference Include="LibGit2Sharp">
+      <Version>0.31.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
