@@ -1912,7 +1912,7 @@ namespace DSPRE.Resources {
             [0x00D7] = "TrainerMsgCheck",
             [0x00D8] = "TrainerRematchMsgCheck",
             [0x00D9] = "TrainerTypeCheck",
-            [0x00DA] = "TrainerMusic",
+            [0x00DA] = "TrainerEncounterMusic",
             [0x00DB] = "LostBattle",
             [0x00DC] = "CheckBattleVictory",
             [0x00DD] = "CheckDefeatedPokemon",
@@ -2047,6 +2047,8 @@ namespace DSPRE.Resources {
             [0x0190] = "Strength",
             [0x0191] = "Flash",
 
+            [0x01A4] = "IncrementRecordStat",
+
             [0x01A7] = "CheckCompleteJohtoDex",
             [0x01A8] = "CheckCompleteNationalDex",
 
@@ -2134,11 +2136,15 @@ namespace DSPRE.Resources {
 
             [0x0217] = "GetPokemonLevel",
 
+            [0x021A] = "GetTrendySaying",
+
+            [0x021C] = "CheckTrendySayingComplete",
             [0x021D] = "TextNumberSp",
 
             [0x021F] = "CheckBirthday",
             [0x0220] = "MusicVolumeSet",
             [0x0221] = "CountSeenUnown",
+            [0x0222] = "CheckEngimaStoneEventStatus",
 
             [0x022C] = "TakeBP",
             [0x022D] = "CheckBP",
@@ -2240,6 +2246,8 @@ namespace DSPRE.Resources {
             [0x028A] = "EndScratchOffCard",
             [0x028B] = "GetScratchOffPrize",
 
+            [0x0302] = "CheckSeenAllLetterUnown",
+
             [0x0306] = "ShowLegendaryWing",
 
             [0x030C] = "VoltorbFlip",
@@ -2256,6 +2264,7 @@ namespace DSPRE.Resources {
             [0x031C] = "HideMomMoney",
 
             [0x032D] = "CheckMomGift",
+            [0x032E] = "DisableSurfMusic",
 
             [0x033C] = "AddContestStat",
             [0x033D] = "CheckFollowingPokeNextToPlayer",

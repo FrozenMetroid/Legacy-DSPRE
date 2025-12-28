@@ -673,7 +673,7 @@ namespace DSPRE.Resources {
                 [0x09] = "[09] Headbutt - Rare Encounter",
                 [0x0A] = "[0A] Headbutt - Special Encounter",
                 [0x0B] = "[0B] Old Château floor",
-                [0x0C] = "[0C] Ground Mountain",
+                [0x0C] = "[0C] Force Plain Terrain in Battle",
                 [0x10] = "[10] River Water (Wild)",
                 [0x11] = "[11] Whirlpool (HGSS)",
                 [0x13] = "[13] Waterfall",
